@@ -1,4 +1,4 @@
-package POA.projet_POA.projet.marche;
+package marche;
 
 public class Marche {
     

@@ -1,4 +1,4 @@
-package POA.projet_POA.projet.vendeur;
+package vendeur;
 
 public class Vendeur {
     
