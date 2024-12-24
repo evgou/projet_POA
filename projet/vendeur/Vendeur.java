@@ -12,7 +12,9 @@ import java.util.logging.Logger;
 public class Vendeur extends Agent{
     private static final Logger logger = Logger.getLogger(AgentInitiateur.class.getName());
 
-
+    /**
+     * Setup :
+     */
     protected void setup() {
         logger.info("Agent Vendeur " + this.getName() + " is ready.");
         // Register the fishmarket service in the yellow pages
@@ -37,7 +39,7 @@ public class Vendeur extends Agent{
         sd.addOntologies("fish-auction-ontology");
         // Agents that want to use this service need to "speak" the FIPA-SL language
         sd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
-        ...
+        // TODO terminer le code
         dfd.addServices(sd);
         DFService.register(this, new AID("market", AID.ISLOCALNAME), dfd);
     }
