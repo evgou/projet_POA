@@ -29,12 +29,10 @@ import jade.core.*;
 import jade.core.behaviours.*;
 import jade.lang.acl.*;
 import jade.proto.states.MsgReceiver;
-import java.util.Date;
+
 import java.util.Vector;
-import java.util.Enumeration;
+
 import jade.util.leap.Iterator;
-import jade.util.leap.Map;
-import jade.util.leap.HashMap;
 import jade.util.leap.List;
 import jade.util.leap.ArrayList;
 import jade.util.leap.Serializable;
@@ -164,9 +162,10 @@ public class SubscriptionInitiator extends Initiator {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895820003L;
 			
-			public void action() {
+			public int action() {
 				handleAgree((ACLMessage) getDataStore().get(REPLY_K));
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());		
 		registerState(b, HANDLE_AGREE);
@@ -175,9 +174,10 @@ public class SubscriptionInitiator extends Initiator {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895820004L;
 			
-			public void action() {
+			public int action() {
 				handleRefuse((ACLMessage) getDataStore().get(REPLY_K));
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());		
 		registerState(b, HANDLE_REFUSE);
@@ -186,9 +186,10 @@ public class SubscriptionInitiator extends Initiator {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895820006L;
 			
-			public void action() {
+			public int action() {
 				handleInform((ACLMessage) getDataStore().get(REPLY_K));
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());		
 		registerState(b, HANDLE_INFORM);
@@ -196,17 +197,19 @@ public class SubscriptionInitiator extends Initiator {
 		// HANDLE_ALL_RESPONSES
 		b = new OneShotBehaviour(myAgent) {
 			
-			public void action() {
+			public int action() {
 				handleAllResponses((Vector) getDataStore().get(ALL_RESPONSES_KEY));
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());		
 		registerState(b, HANDLE_ALL_RESPONSES);
 		
 		// CHECK_AGAIN
 		b = new OneShotBehaviour(myAgent) {
-			public void action() {
-			}
+			public int action() {
+                return 0;
+            }
 			public int onEnd() {
 				return sessions.size();
 			}

@@ -1,4 +1,4 @@
-package POA.projet_POA.projet.preneur;
+package preneur;
 
 public class Preneur {
     

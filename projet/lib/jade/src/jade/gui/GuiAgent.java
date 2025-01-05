@@ -86,7 +86,7 @@ public abstract class GuiAgent extends Agent
 			super(GuiAgent.this);
 		}
 
-		public void action()
+		public int action()
 		{
 			if (!guiEventQueue.isEmpty())
 			{
@@ -122,7 +122,8 @@ public abstract class GuiAgent extends Agent
 			}
 			else
 				block();
-		}
+            return 0;
+        }
 
 		public boolean done()
 		{

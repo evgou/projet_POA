@@ -29,11 +29,11 @@ public abstract class GatewayBehaviour extends CyclicBehaviour {
 
 	private final Logger myLogger = Logger.getMyLogger(this.getClass().getName());
 
-	public void action() {
+	public int action() {
 		Event e = (Event) myAgent.getO2AObject();
 		if (e == null) {
 			block();
-			return;
+            return 0;
 		}
 		// put the event into the command Queue
 		commandQueue.put(e.getSource(), e);
@@ -42,7 +42,8 @@ public abstract class GatewayBehaviour extends CyclicBehaviour {
 		}
 		// call the processCommand method such as the command is executed
 		processCommand(e.getSource());
-	}
+        return 0;
+    }
 
 	/** subclasses must implement this method.
 	 * The method is called each time a request to process a command

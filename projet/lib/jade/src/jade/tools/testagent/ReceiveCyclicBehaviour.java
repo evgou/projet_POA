@@ -26,7 +26,6 @@
 package jade.tools.testagent;
 
 import jade.core.behaviours.*;
-import jade.lang.acl.*;
 
 /**
  *  This behaviour is used for receiving ACLMessage and giving them to the TestAgent
@@ -46,10 +45,13 @@ public class ReceiveCyclicBehaviour extends CyclicBehaviour {
 
 
   /**
-   *  Description of the Method
+   * Description of the Method
+   *
+   * @return
    */
-  public void action() {
+  public int action() {
     agent.processIncomingMessage(agent.blockingReceive());
+      return 0;
   }
 
 

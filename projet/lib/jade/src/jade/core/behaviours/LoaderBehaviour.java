@@ -108,9 +108,11 @@ public class LoaderBehaviour extends Behaviour {
 	}
 	
 	/**
-	   The action() method is redefined to serve behaviour loading requests
+	 * The action() method is redefined to serve behaviour loading requests
+	 *
+	 * @return
 	 */
-	public final void action() {
+	public final int action() {
 		if (!finished) {
 			ACLMessage msg = myAgent.receive(myTemplate);
 			if (msg != null) {
@@ -184,7 +186,8 @@ public class LoaderBehaviour extends Behaviour {
 				block();
 			}
 		}
-	}
+        return 0;
+    }
 	
 	/**
 	   The done() method is redefined to make this behaviour terminate
@@ -381,7 +384,7 @@ public class LoaderBehaviour extends Behaviour {
 			request = m;
 		}
 		
-		public void action() {
+		public int action() {
 			// Avoid sending back the behaviour code
 			LoadBehaviour lb = (LoadBehaviour) actionExpr.getAction();
 			lb.setCode(null);
@@ -405,7 +408,8 @@ public class LoaderBehaviour extends Behaviour {
 				notification.setPerformative(ACLMessage.FAILURE);
 				notification.setContent("((internal-error \""+e.toString()+"\"))");
 			}
-			myAgent.send(notification);	
-		}
+			myAgent.send(notification);
+            return 0;
+        }
 	} // END of inner class ResultCollector			
 }

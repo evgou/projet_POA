@@ -25,17 +25,10 @@ Boston, MA  02111-1307, USA.
 package demo.MeetingScheduler;
 import jade.core.behaviours.CyclicBehaviour;
 
-import jade.core.Agent;
-import jade.core.AID;
-
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import jade.domain.FIPAException;
-
-import java.io.*;
-import java.util.Date;
-import jade.util.leap.List;
 
 import demo.MeetingScheduler.Ontology.*;
 
@@ -55,11 +48,11 @@ public class CancelAppointmentBehaviour extends CyclicBehaviour {
     myAgent = a;
   }
 
-  public void action(){
+  public int action(){
     cancel = myAgent.receive(mt);
     if (cancel == null) {
       block();
-      return;
+        return 0;
     }
     //System.err.println("CancelAppointmentBehaviour: received "+cancel.toString());
     try {
@@ -72,6 +65,7 @@ public class CancelAppointmentBehaviour extends CyclicBehaviour {
     }catch (FIPAException e) {
       e.printStackTrace();
     }
+      return 0;
   }
 }
 

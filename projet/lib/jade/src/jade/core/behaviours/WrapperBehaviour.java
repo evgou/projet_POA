@@ -1,8 +1,6 @@
 package jade.core.behaviours;
 
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.CompositeBehaviour;
 import jade.util.leap.Collection;
 
 /**
@@ -113,9 +111,10 @@ public class WrapperBehaviour extends Behaviour {
 		wrappedBehaviour.onStart();
 	}
 	
-	public void action() {
+	public int action() {
 		wrappedBehaviour.action();
-	}
+        return 0;
+    }
 	
 	public boolean done() {
 		return wrappedBehaviour.done();

@@ -35,9 +35,6 @@ import java.util.Enumeration;
 import jade.util.leap.Iterator;
 import jade.util.leap.Map;
 import jade.util.leap.HashMap;
-import jade.util.leap.List;
-import jade.util.leap.ArrayList;
-import jade.util.leap.Serializable;
 
 /**
  * @author Giovanni Caire - TILab
@@ -112,14 +109,15 @@ abstract class Initiator extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818000L;
 			
-			public void action() {
+			public int action() {
 				DataStore ds = getDataStore();
 				Vector allInitiations = (Vector) ds.get(ALL_INITIATIONS_K);
 				if (allInitiations == null || allInitiations.size() == 0) {
 					allInitiations = prepareInitiations((ACLMessage) ds.get(INITIATION_K));
 					ds.put(ALL_INITIATIONS_K, allInitiations);
 				}
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());		
 		registerFirstState(b, PREPARE_INITIATIONS);
@@ -128,12 +126,13 @@ abstract class Initiator extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818001L;
 			
-			public void action() {
+			public int action() {
 				Vector allInitiations = (Vector) getDataStore().get(ALL_INITIATIONS_K);
 				if (allInitiations != null) {
 					sendInitiations(allInitiations);
 				}
-			}	
+                return 0;
+            }
 			public int onEnd() {
 				return sessions.size();
 			}
@@ -150,7 +149,7 @@ abstract class Initiator extends FSMBehaviour {
 			int ret;
 			private static final long     serialVersionUID = 3487495895818002L;
 			
-			public void action() {
+			public int action() {
 				ACLMessage reply = (ACLMessage) getDataStore().get(REPLY_K);
 				if (checkInSequence(reply)) {
 					ret = reply.getPerformative();
@@ -158,7 +157,8 @@ abstract class Initiator extends FSMBehaviour {
 				else {
 					ret = -1;
 				}
-			}
+                return 0;
+            }
 			public int onEnd() {
 				return ret;
 			}
@@ -170,9 +170,10 @@ abstract class Initiator extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818005L;
 			
-			public void action() {
+			public int action() {
 				handleNotUnderstood((ACLMessage) getDataStore().get(REPLY_K));
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());		
 		registerState(b, HANDLE_NOT_UNDERSTOOD);
@@ -181,9 +182,10 @@ abstract class Initiator extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818007L;
 			
-			public void action() {
+			public int action() {
 				handleFailure((ACLMessage) getDataStore().get(REPLY_K));
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());		
 		registerState(b, HANDLE_FAILURE);
@@ -192,9 +194,10 @@ abstract class Initiator extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818008L;
 			
-			public void action() {
+			public int action() {
 				handleOutOfSequence((ACLMessage) getDataStore().get(REPLY_K));
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());		
 		registerState(b, HANDLE_OUT_OF_SEQ);
@@ -204,10 +207,11 @@ abstract class Initiator extends FSMBehaviour {
 			int ret;
 			private static final long     serialVersionUID = 3487495895818009L;
 			
-			public void action() {
+			public int action() {
 				ACLMessage reply = (ACLMessage) getDataStore().get(REPLY_K);
 				ret = checkSessions(reply);
-			}		
+                return 0;
+            }
 			public int onEnd() {
 				return ret;
 			}
@@ -219,8 +223,9 @@ abstract class Initiator extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818010L;
 			
-			public void action() {
-			}
+			public int action() {
+                return 0;
+            }
 		};
 		registerLastState(b, DUMMY_FINAL);
 	}

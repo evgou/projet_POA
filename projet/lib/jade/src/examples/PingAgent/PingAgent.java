@@ -51,7 +51,7 @@ public class PingAgent extends Agent {
 			super(a);
 		}
 
-		public void action() {
+		public int action() {
 			ACLMessage  msg = myAgent.receive();
 			if(msg != null){
 				ACLMessage reply = msg.createReply();
@@ -80,7 +80,8 @@ public class PingAgent extends Agent {
 			else {
 				block();
 			}
-		}
+            return 0;
+        }
 	} // END of inner class WaitPingAndReplyBehaviour
 
 

@@ -165,7 +165,7 @@ public class SimpleAchieveREInitiator extends SimpleBehaviour{
     }
 
 
-    public final void action(){
+    public final int action(){
 
 	switch(state){
 	case PREPARE_MSG_STATE:{
@@ -342,6 +342,7 @@ public class SimpleAchieveREInitiator extends SimpleBehaviour{
 	}
 	default: break;
 	}
+        return 0;
     }
 
     public void onStart(){

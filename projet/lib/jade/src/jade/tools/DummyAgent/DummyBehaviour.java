@@ -25,8 +25,6 @@ Boston, MA  02111-1307, USA.
 package jade.tools.DummyAgent;
 
 //Import required Java classes 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 
 import java.util.*;
@@ -47,7 +45,7 @@ class DummyBehaviour extends CyclicBehaviour {
 		super(a);
 	}
 
-	public void action() {
+	public int action() {
 		ACLMessage msg = myAgent.receive();
 		if (msg != null) {		
 			// ATTENTION!! In order to insert the received message in the queued message list 
@@ -70,7 +68,8 @@ class DummyBehaviour extends CyclicBehaviour {
 		else {
 			block();
 		}
-	}
+        return 0;
+    }
 
 	class EDTRequester implements Runnable {
 		DummyAgent agent;

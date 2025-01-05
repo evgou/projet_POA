@@ -71,7 +71,7 @@ public class ReplySender extends OneShotBehaviour {
 		this.msgKey = msgKey;	
 	}
 	
-	public void action(){
+	public int action(){
 		ret=NO_REPLY_SENT;
 		DataStore ds = getDataStore();
 		ACLMessage reply = (ACLMessage) ds.get(replyKey);
@@ -83,7 +83,8 @@ public class ReplySender extends OneShotBehaviour {
 				ret = reply.getPerformative();
 			}		
 		}
-	}
+        return 0;
+    }
 	
 	public int onEnd() {
 		return ret;

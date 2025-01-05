@@ -319,7 +319,7 @@ public class DFService extends FIPAService {
 			if (deadline == null || lease.getTime() < deadline.getTime()) {
 				dfd.setLeaseTime(deadline);
 				a.addBehaviour(new WakerBehaviour(a, new Date(lease.getTime() - OFFSET)) {
-					protected void onWake() {
+					protected int onWake() {
 						try {
 							DFAgentDescription newDfd = modify(myAgent, theDF, dfd);
 							keepRegistered(myAgent, theDF, newDfd, dfd.getLeaseTime());
@@ -328,7 +328,8 @@ public class DFService extends FIPAService {
 							// There is nothing we can do
 							fe.printStackTrace();
 						}
-					}
+                        return 0;
+                    }
 				} );
 			}
 		}

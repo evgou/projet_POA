@@ -235,7 +235,7 @@ public class SSIteratedAchieveREResponder extends SSResponder {
 			super(a);
 		}
 		
-		public void action() {
+		public int action() {
 			SSIteratedAchieveREResponder parent = (SSIteratedAchieveREResponder) getParent();
 			ACLMessage reply = null;
 			try {
@@ -245,7 +245,8 @@ public class SSIteratedAchieveREResponder extends SSResponder {
 				reply = fe.getACLMessage();
 			}
 			getDataStore().put(parent.REPLY_KEY, reply);
-		}
+            return 0;
+        }
 	} // End of inner class RequestHandler
 	
 	
@@ -259,10 +260,11 @@ public class SSIteratedAchieveREResponder extends SSResponder {
 			super(a);
 		}
 		
-		public void action() {
+		public int action() {
 			SSIteratedAchieveREResponder parent = (SSIteratedAchieveREResponder) getParent();
 			parent.handleCancel((ACLMessage) getDataStore().get(parent.CANCEL_KEY));
-		}
+            return 0;
+        }
 	} // End of inner class CancelHandler  
 }	
 

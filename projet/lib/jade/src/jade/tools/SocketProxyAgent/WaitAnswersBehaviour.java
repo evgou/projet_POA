@@ -27,7 +27,6 @@ import java.io.*;
 import java.util.*;
 
 import jade.core.Agent;
-import jade.core.AID;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.*;
 import jade.util.Logger;
@@ -101,8 +100,10 @@ class WaitAnswersBehaviour extends SimpleBehaviour {
      * behaviour action
      * blocking receive for message, followed by copying that message
      * to the output stream.
+     *
+     * @return
      */
-    public void action() {
+    public int action() {
 	if ( logger.isLoggable( Logger.FINE ) ) {
 	    logger.log( Logger.FINE, 
                 myThreadName + ": About to block, message template "+ mt +
@@ -135,7 +136,8 @@ class WaitAnswersBehaviour extends SimpleBehaviour {
 	    logger.log( Logger.FINE, 
 			myThreadName + ": set finished=" + finished );
 	}
-        
+
+        return 0;
     }
     
     /**

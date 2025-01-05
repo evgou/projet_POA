@@ -85,9 +85,10 @@ public class IteratedAchieveREInitiator extends AchieveREInitiator {
 		
 		// REINIT
 		b = new OneShotBehaviour(myAgent) {
-			public void action() {
+			public int action() {
 				prepareForNextRound();
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());
 		registerState(b, REINIT);

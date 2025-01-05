@@ -55,7 +55,7 @@ public class CustomTemplateAgent extends Agent {
 		System.out.println("Agent "+getLocalName()+" is ready.");
 		
 		addBehaviour(new CyclicBehaviour(this) {
-			public void action() {
+			public int action() {
 				ACLMessage msg = myAgent.receive(template);
 				if (msg != null) {
 					System.out.println("Message matching custom template received:");
@@ -64,7 +64,8 @@ public class CustomTemplateAgent extends Agent {
 				else {
 					block();
 				}
-			}
+                return 0;
+            }
 		} );
 	}
 }

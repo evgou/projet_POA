@@ -56,7 +56,7 @@ class ServeIncomingMessagesBehaviour extends SimpleBehaviour
 		return false;
 	}
 
-	public void action()
+	public int action()
 	{
 		ACLMessage msg;
 		MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
@@ -65,7 +65,7 @@ class ServeIncomingMessagesBehaviour extends SimpleBehaviour
 		msg = myAgent.receive(mt);
 		if (msg == null) {
 			block();
-		 	return;
+            return 0;
 		}
 		else {
 			String replySentence = "";
@@ -141,7 +141,7 @@ class ServeIncomingMessagesBehaviour extends SimpleBehaviour
 			myAgent.send(replyMsg);
 		}
 
-		return;
+        return 0;
 	}
 }
 

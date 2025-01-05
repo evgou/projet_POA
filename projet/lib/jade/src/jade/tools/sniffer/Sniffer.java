@@ -24,16 +24,13 @@ Boston, MA  02111-1307, USA.
 package jade.tools.sniffer;
 
 
-import java.io.StringReader;
-
 import java.util.Map;
-import java.util.TreeMap;
+
 import jade.util.leap.Iterator;
 import jade.util.leap.List;
 import jade.util.leap.ArrayList;
 import jade.util.Logger;
 
-import java.util.LinkedList;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.HashSet;
@@ -41,7 +38,6 @@ import java.util.HashSet;
 import jade.core.*;
 import jade.core.behaviours.*;
 
-import jade.domain.FIPANames;
 import jade.domain.JADEAgentManagement.*;
 import jade.domain.introspection.*;
 import jade.domain.FIPAService;
@@ -51,8 +47,6 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.ACLCodec;
 import jade.lang.acl.StringACLCodec;
-
-import jade.content.lang.sl.SLCodec;
 
 import jade.content.AgentAction;
 import jade.content.onto.basic.Action;
@@ -195,7 +189,7 @@ public class Sniffer extends ToolAgent {
 			listenSniffTemplate = MessageTemplate.MatchConversationId(getName() + "-event");
 		}
 
-		public void action() {
+		public int action() {
 
 			ACLMessage current = receive(listenSniffTemplate);
 			if(current != null) {
@@ -219,10 +213,10 @@ public class Sniffer extends ToolAgent {
 						// If the sender is currently under sniff, then the message was already
 						// displayed when the 'sent-message' event occurred --> just skip this message.
 						if(agentsUnderSniff.contains(new Agent(sender))) {
-							return;
+                            return 0;
 						}
 					} else {
-						return;
+                        return 0;
 					}
 
 					ACLCodec codec = new StringACLCodec();
@@ -271,7 +265,8 @@ public class Sniffer extends ToolAgent {
 			}
 			else
 				block();
-		}
+            return 0;
+        }
 
 	} // End of SniffListenerBehaviour
 

@@ -47,7 +47,7 @@ class CounterBehaviour extends SimpleBehaviour
 		return false;
 	}
 
-	public void action()
+	public int action()
 	{
 		// If counting is enabled, print current number and increment counter
 		if ( ((MobileAgent) myAgent).cntEnabled )
@@ -61,7 +61,7 @@ class CounterBehaviour extends SimpleBehaviour
 		
 		block(2000);
 
-		return;
+        return 0;
 	}
 }
 

@@ -30,10 +30,8 @@ import jade.core.behaviours.*;
 import jade.lang.acl.*;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
-import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPANames;
 import jade.proto.states.*;
-import jade.util.leap.Iterator;
 
 /**
 * Behaviour class for <code>fipa-propose</code>
@@ -105,7 +103,7 @@ public class ProposeResponder extends FSMBehaviour implements FIPANames.Interact
 	private PrepareResponse() {
 	}
 
-        public void action() {
+        public int action() {
 	    ProposeResponder fsm = (ProposeResponder)getParent();
 	    DataStore ds = getDataStore();
 	    ACLMessage propose = (ACLMessage) ds.get(fsm.PROPOSE_KEY);
@@ -121,6 +119,7 @@ public class ProposeResponder extends FSMBehaviour implements FIPANames.Interact
 		response = re.getACLMessage();
 	    }
 	    ds.put(fsm.RESPONSE_KEY, response);
+            return 0;
         }
 
     } // End of PrepareResponse class

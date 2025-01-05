@@ -48,7 +48,6 @@ package examples.party;
 ///////////////
 import java.awt.*;
 import javax.swing.*;
-import java.beans.*;
 import javax.swing.event.*;
 import java.awt.event.*;
 
@@ -254,8 +253,9 @@ public class HostUIFrame
 
         // add a behaviour to the host to start the conversation going
         m_owner.addBehaviour( new OneShotBehaviour() {
-                                  public void action() {
+                                  public int action() {
                                       ((HostAgent) myAgent).inviteGuests( slide_numGuests.getValue() );
+                                      return 0;
                                   }
                               } );
     }
@@ -269,8 +269,9 @@ public class HostUIFrame
 
         // add a behaviour to the host to end the party
         m_owner.addBehaviour( new OneShotBehaviour() {
-                                  public void action() {
+                                  public int action() {
                                       ((HostAgent) myAgent).endParty();
+                                      return 0;
                                   }
                               } );
     }
@@ -293,8 +294,9 @@ public class HostUIFrame
      */
     void btn_Exit_actionPerformed(ActionEvent e) {
         m_owner.addBehaviour( new OneShotBehaviour() {
-                                  public void action() {
+                                  public int action() {
                                       ((HostAgent) myAgent).terminateHost();
+                                      return 0;
                                   }
                               } );
     }

@@ -27,7 +27,7 @@ public abstract class SSResponderDispatcher extends CyclicBehaviour {
 				activeConversations.getMessageTemplate());
 	}
 	
-	public final void action() {
+	public final int action() {
 		ACLMessage msg = myAgent.receive(template);
 		if (msg != null) {
 			// Be sure a conversation-id is set. If not create a suitable one
@@ -54,7 +54,8 @@ public abstract class SSResponderDispatcher extends CyclicBehaviour {
 		else {
 			block();
 		}
-	}
+        return 0;
+    }
 	
 	/**
 	 * This method is responsible for creating a suitable <code>Behaviour</code> acting as responder

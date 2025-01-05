@@ -27,7 +27,6 @@ package jade.proto;
 
 import jade.core.behaviours.SimpleBehaviour;
 import jade.core.behaviours.DataStore;
-import jade.core.CaseInsensitiveString;
 import jade.core.Agent;
 import jade.core.AID;
 import jade.lang.acl.MessageTemplate;
@@ -119,7 +118,7 @@ public class SimpleAchieveREResponder extends SimpleBehaviour implements FIPANam
 
 	//#APIDOC_EXCLUDE_BEGIN
 
-	public final void action(){
+	public final int action(){
 
 		switch(state){
 		case WAITING_MSG_STATE:{
@@ -201,7 +200,8 @@ public class SimpleAchieveREResponder extends SimpleBehaviour implements FIPANam
 			break;
 		}
 		}
-	}
+        return 0;
+    }
 
 	//#APIDOC_EXCLUDE_END
 

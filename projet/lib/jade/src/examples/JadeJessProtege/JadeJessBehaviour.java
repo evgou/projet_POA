@@ -2,7 +2,6 @@
 // in collaboration with Fabio Bellifemine and Ernest Friedmann-Hill
 package examples.JadeJessProtege;
 import jess.*;
-import java.io.*;
 import jade.core.*;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
@@ -78,7 +77,7 @@ public class JadeJessBehaviour extends CyclicBehaviour // tells JESS about incom
       jessException.printStackTrace(System.err);
       }
     } // end run method
-  public void action() // executes agent behaviour in reaction to messages
+  public int action() // executes agent behaviour in reaction to messages
     {
     ACLMessage message=receive(); // get a message from another agent
     if (message != null) // only do something if anything arrived
@@ -86,5 +85,6 @@ public class JadeJessBehaviour extends CyclicBehaviour // tells JESS about incom
       tell (message); // tell JESS about the message
       run(); // run the JESS engine on the new message
       }
+        return 0;
     } // end behaviour action method
   } // end JadeJessBehaviour class

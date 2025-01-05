@@ -98,13 +98,13 @@ public class MsgReceiver extends SimpleBehaviour {
 	protected MsgReceiver() {
 	}
 
-	public void action() {
+	public int action() {
 		if (interrupted) {
 			if (receivedMsgKey != null) {
 				getDataStore().put(receivedMsgKey, null);
 			}
 			ret = INTERRUPTED;
-			return;
+            return 0;
 		}
 
 		ACLMessage msg = myAgent.receive(template);
@@ -137,7 +137,8 @@ public class MsgReceiver extends SimpleBehaviour {
 				block();
 			}
 		}
-	}
+        return 0;
+    }
 
 	public boolean done() {
 		return received || expired || interrupted;

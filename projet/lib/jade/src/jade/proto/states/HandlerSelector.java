@@ -82,7 +82,7 @@ public abstract class HandlerSelector extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			int ret; 
 			
-			public void action() {
+			public int action() {
 				ret = SELECTION_NOK;
 				Object key = getSelectionKey(getDataStore().get(accesKey));
 				if (key != null) {
@@ -93,7 +93,8 @@ public abstract class HandlerSelector extends FSMBehaviour {
 						ret = SELECTION_OK;
 					}
 				}
-			}
+                return 0;
+            }
 			
 			public int onEnd() {
 				return ret;
@@ -104,7 +105,9 @@ public abstract class HandlerSelector extends FSMBehaviour {
 				
 		// DUMMY
 		b = new OneShotBehaviour(myAgent) {
-			public void action() {}
+			public int action() {
+                return 0;
+            }
 		};
 		registerLastState(b, DUMMY);
 		

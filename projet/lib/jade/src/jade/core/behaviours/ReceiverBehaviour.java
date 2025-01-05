@@ -25,12 +25,9 @@ package jade.core.behaviours;
 
 //#APIDOC_EXCLUDE_FILE
 
-import jade.util.leap.Iterator;
 import jade.util.leap.Serializable;
 
 import jade.core.Agent;
-
-import jade.core.AID;
 
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -270,12 +267,14 @@ public final class ReceiverBehaviour extends Behaviour {
   }
 
   /**
-     Actual behaviour implementation. This method receives a suitable
-     ACL message and copies it into the message provided by the
-     behaviour creator. It blocks the current behaviour if no suitable
-     message is available.
-  */
-  public void action() {
+   * Actual behaviour implementation. This method receives a suitable
+   * ACL message and copies it into the message provided by the
+   * behaviour creator. It blocks the current behaviour if no suitable
+   * message is available.
+   *
+   * @return
+   */
+  public int action() {
     ACLMessage msg = null;
     if(template == null)
       msg = myAgent.receive();
@@ -286,7 +285,7 @@ public final class ReceiverBehaviour extends Behaviour {
       if(timeOut < 0) {
 	block();
 	finished = false;
-	return;
+          return 0;
       }
       else {
 	long elapsedTime = 0;
@@ -299,7 +298,7 @@ public final class ReceiverBehaviour extends Behaviour {
 	  blockingTime  = System.currentTimeMillis();
 	  // System.out.println("Waiting for " + timeToWait + " ms.");
 	  block(timeToWait);
-	  return;
+        return 0;
 	}
 	else {
 	  future.setMessage(msg);
@@ -311,6 +310,7 @@ public final class ReceiverBehaviour extends Behaviour {
 	future.setMessage(msg);
 	finished = true;
     }
+      return 0;
   }
 
   /**

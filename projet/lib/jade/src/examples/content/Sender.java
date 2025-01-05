@@ -53,7 +53,7 @@ public class Sender extends Agent {
 	
 	public boolean done() { return finished; }
 	
-	public void action() {
+	public int action() {
 	    try {
 		// Preparing the first message
 		System.out.println( "[" + getLocalName() + "] Creating inform message with content fatherOf(man :name John :address London, [man :name Bill :address Paris])");
@@ -133,7 +133,8 @@ public class Sender extends Agent {
 	    } catch(Exception e) { e.printStackTrace(); }
 
 	    finished = true;
-	}
+        return 0;
+    }
     }
      
     protected void setup() {

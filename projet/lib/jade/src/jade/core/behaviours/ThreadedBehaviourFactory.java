@@ -238,11 +238,12 @@ public class ThreadedBehaviourFactory {
 			myThread.start();			
 		}
 		
-		public void action() {
+		public int action() {
 			if (!finished) {
 				block();
 			}
-		}
+            return 0;
+        }
 		
 		public boolean done() {
 			return finished;

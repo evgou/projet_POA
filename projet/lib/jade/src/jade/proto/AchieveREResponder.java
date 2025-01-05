@@ -33,7 +33,6 @@ import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPANames;
 import jade.proto.states.*;
-import jade.util.leap.Iterator;
 
 /**
  *
@@ -105,7 +104,7 @@ public class AchieveREResponder extends FSMBehaviour implements FIPANames.Intera
 			super(a);
 		}
 		
-		public void action() {
+		public int action() {
 			DataStore ds = getDataStore();
 			AchieveREResponder fsm = (AchieveREResponder)getParent();
 			ACLMessage request = (ACLMessage) ds.get(fsm.REQUEST_KEY);
@@ -121,7 +120,8 @@ public class AchieveREResponder extends FSMBehaviour implements FIPANames.Intera
 				response = re.getACLMessage();
 			}
 			ds.put(fsm.RESPONSE_KEY, response);
-		}
+            return 0;
+        }
 	} // End of HandleRequest class
 	
 	
@@ -157,7 +157,7 @@ public class AchieveREResponder extends FSMBehaviour implements FIPANames.Intera
 		private PrepareResult() {
 		}
 		
-		public void action() {
+		public int action() {
 			DataStore ds = getDataStore();
 			AchieveREResponder fsm = (AchieveREResponder)getParent();
 			ACLMessage request = (ACLMessage) ds.get(fsm.REQUEST_KEY);
@@ -170,7 +170,8 @@ public class AchieveREResponder extends FSMBehaviour implements FIPANames.Intera
 				resNotification = fe.getACLMessage();
 			}
 			ds.put(fsm.RESULT_NOTIFICATION_KEY, resNotification);
-		}
+            return 0;
+        }
 		
 	} // End of PrepareResult class
 	

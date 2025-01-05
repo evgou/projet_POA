@@ -67,13 +67,16 @@ public final class SenderBehaviour extends OneShotBehaviour {
   }
 
   /**
-     Actual behaviour implementation. This method sends an ACL
-     message, using either the given <code>AgentGroup</code> or the
-     <code>:receiver</code> message slot to get the message recipient
-     names.
-  */
-  public void action() {
+   * Actual behaviour implementation. This method sends an ACL
+   * message, using either the given <code>AgentGroup</code> or the
+   * <code>:receiver</code> message slot to get the message recipient
+   * names.
+   *
+   * @return
+   */
+  public int action() {
     myAgent.send(message);
+      return 0;
   }
 
 }

@@ -213,8 +213,10 @@ public class BasicJessBehaviour extends CyclicBehaviour {
 
     /**
      * executes the behaviour
+     *
+     * @return
      */
-    public void action() {
+    public int action() {
         ACLMessage msg; // to keep the ACLMessage
 
         // wait a message
@@ -249,6 +251,7 @@ public class BasicJessBehaviour extends CyclicBehaviour {
         } catch (JessException re) {
             re.printStackTrace(System.err);
         }
+        return 0;
     }
 
     private boolean isEmpty(String string) {

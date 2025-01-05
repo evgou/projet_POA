@@ -33,7 +33,6 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import jade.core.Runtime;
-import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.*;
 
@@ -142,7 +141,7 @@ public class ThanksAgent extends Agent {
 		// if an ANSWER to a greetings message is arrived 
 		// then send a THANKS message
 		addBehaviour(new CyclicBehaviour(this) {
-			public void action() {
+			public int action() {
 				// listen if a greetings message arrives
 				ACLMessage msg = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 				if (msg != null) {
@@ -201,7 +200,8 @@ public class ThanksAgent extends Agent {
 					// if no message is arrived, block the behaviour
 					block();
 				}
-			}
+                return 0;
+            }
 		});
 	}
 

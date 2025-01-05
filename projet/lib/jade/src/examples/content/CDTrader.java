@@ -30,7 +30,6 @@ import jade.lang.acl.MessageTemplate;
 
 import jade.util.leap.List;
 import jade.util.leap.ArrayList;
-import jade.util.leap.Iterator;
 
 import jade.content.*;
 import jade.content.abs.*;
@@ -108,7 +107,7 @@ public class CDTrader extends Agent {
 				this.it = it;
 			}
 	
-			public void action() {
+			public int action() {
 	    	try {
 					System.out.println("\nSELLER: Inform BUYER that I own "+it);
 
@@ -133,7 +132,8 @@ public class CDTrader extends Agent {
 	    		e.printStackTrace(); 
 	    	}
 
-			}
+                return 0;
+            }
     }
      
     // BUYER handles informations received from the SELLER
@@ -143,7 +143,7 @@ public class CDTrader extends Agent {
 				super(a); 
 			}
 	
-			public void action() {
+			public int action() {
 				ACLMessage msg = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 				if (msg != null) {
 					System.out.println("\nBUYER: Information received from SELLER. Message is");
@@ -214,7 +214,8 @@ public class CDTrader extends Agent {
 	    	else {
 	    		block();
 	    	}
-			}
+                return 0;
+            }
 			
     }
     
@@ -227,7 +228,7 @@ public class CDTrader extends Agent {
 				this.it = it;
 			}
 	
-			public void action() {
+			public int action() {
 	    	try {
 					System.out.println("\nBUYER: Query price of "+it);
 
@@ -260,7 +261,8 @@ public class CDTrader extends Agent {
 	    		e.printStackTrace(); 
 	    	}
 
-			}
+                return 0;
+            }
     }
      
     // SELLER handles queries received from BUYER
@@ -270,7 +272,7 @@ public class CDTrader extends Agent {
 				super(a); 
 			}
 	
-			public void action() {
+			public int action() {
 				ACLMessage msg = receive(MessageTemplate.MatchPerformative(ACLMessage.QUERY_REF));
 				if (msg != null) {
 	    		try {
@@ -303,7 +305,8 @@ public class CDTrader extends Agent {
 	    	else {
 	    		block();
 	    	}
-			}
+                return 0;
+            }
 			
     }
     
@@ -316,7 +319,7 @@ public class CDTrader extends Agent {
 				this.it = it;
 			}
 	
-			public void action() {
+			public int action() {
 	    	try {
 					System.out.println("\nSELLER: Inform Buyer about price of item "+it);
 
@@ -352,7 +355,8 @@ public class CDTrader extends Agent {
 	    		e.printStackTrace(); 
 	    	}
 
-			}
+                return 0;
+            }
     }
      
     // BUYER requests SELLER to sell a given Item
@@ -365,7 +369,7 @@ public class CDTrader extends Agent {
 				this.it = it;
 			}
 	
-			public void action() {
+			public int action() {
 	    	try {
 					System.out.println("\nBUYER: Request seller to sell item "+it);
 
@@ -394,7 +398,8 @@ public class CDTrader extends Agent {
 	    		e.printStackTrace(); 
 	    	}
 
-			}
+                return 0;
+            }
     }
     
     // SELLER handles requests from BUYER
@@ -404,7 +409,7 @@ public class CDTrader extends Agent {
 				super(a); 
 			}
 	
-			public void action() {
+			public int action() {
 				ACLMessage msg = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
 				if (msg != null) {
 	    		try {
@@ -428,7 +433,8 @@ public class CDTrader extends Agent {
 	    	else {
 	    		block();
 	    	}
-			}
+                return 0;
+            }
     }
         	
     // SELLER informs BUYER that a given action has been completed
@@ -440,7 +446,7 @@ public class CDTrader extends Agent {
 				this.act = act;
 			}
 	
-			public void action() {
+			public int action() {
 	    	try {
 					System.out.println("\nSELLER: Inform Buyer that the requested operation has been completed");
 
@@ -462,7 +468,8 @@ public class CDTrader extends Agent {
 	    		e.printStackTrace(); 
 	    	}
 
-			}
+                return 0;
+            }
     }
      
 }

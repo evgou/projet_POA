@@ -46,9 +46,10 @@ public class SimpleAgent extends Agent {
 
     // Add the CyclicBehaviour
     addBehaviour(new CyclicBehaviour(this) {
-      public void action() {
+      public int action() {
         System.out.println("Cycling");
-      } 
+          return 0;
+      }
     });
 
     // Add the generic behaviour
@@ -61,7 +62,7 @@ public class SimpleAgent extends Agent {
   private class FourStepBehaviour extends Behaviour {
     private int step = 1;
 
-    public void action() {
+    public int action() {
       switch (step) {
       case 1:
         // Perform operation 1: print out a message
@@ -71,9 +72,10 @@ public class SimpleAgent extends Agent {
         // Perform operation 2: Add a OneShotBehaviour
         System.out.println("Operation 2. Adding one-shot behaviour");
         myAgent.addBehaviour(new OneShotBehaviour(myAgent) {
-          public void action() {
+          public int action() {
             System.out.println("One-shot");
-          } 
+              return 0;
+          }
         });
         break;
       case 3:
@@ -86,7 +88,8 @@ public class SimpleAgent extends Agent {
         break;
       }
       step++;
-    } 
+        return 0;
+    }
 
     public boolean done() {
       return step == 5;

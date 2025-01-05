@@ -27,7 +27,7 @@ public class CreatorAgent extends Agent {
 		System.out.println("Hello. I'm going to create a new agent in container "+containerName+" in 5 seconds...");
 		addBehaviour(new WakerBehaviour(this, 5000) {
 			@Override
-			public void onWake() {
+			public int onWake() {
 				// Request the AMS to perform the CreateAgent action of the JADEManagementOntology
 				// To do this use an ActionExecutor behaviour requesting the CreateAgent action and expecting no result (Void) 
 				System.out.println("Creating agent!");
@@ -51,7 +51,8 @@ public class CreatorAgent extends Agent {
 					}
 				};
 				addBehaviour(ae);
-			}
+                return 0;
+            }
 		});
 	}
 }

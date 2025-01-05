@@ -119,7 +119,7 @@ public class GuestAgent
 
             // add a Behaviour to process incoming messages
             addBehaviour( new CyclicBehaviour( this ) {
-                            public void action() {
+                            public int action() {
                                 // listen if a greetings message arrives
                                 ACLMessage msg = receive( MessageTemplate.MatchPerformative( ACLMessage.INFORM ) );
 
@@ -148,6 +148,7 @@ public class GuestAgent
                                     // if no message is arrived, block the behaviour
                                     block();
                                 }
+                                return 0;
                             }
                         } );
         }

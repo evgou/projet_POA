@@ -43,9 +43,6 @@ import java.util.Hashtable;
 import jade.core.*;
 import jade.core.behaviours.*;
 
-import jade.core.event.PlatformEvent;
-import jade.core.event.MTPEvent;
-
 import jade.domain.FIPAAgentManagement.InternalError;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.JADEAgentManagement.*;
@@ -201,9 +198,10 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 		// Temporary patch: 
 		SequentialBehaviour sb = new SequentialBehaviour();
 		sb.addSubBehaviour(new WakerBehaviour(this, 1000) {
-			public void onWake() {
+			public int onWake() {
 				// Just do nothing
-			}
+                return 0;
+            }
 		});
 		sb.addSubBehaviour(registerTool);
 		addBehaviour(sb);
@@ -744,7 +742,7 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 
 		}
 
-		public void action() {
+		public int action() {
 
 			// Receive 'subscribe' ACL messages.
 			ACLMessage current = receive(subscriptionTemplate);
@@ -870,7 +868,8 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 			} else
 				block();
 
-		}
+            return 0;
+        }
 
 	} // End of RegisterToolBehaviour inner class
 
@@ -895,7 +894,7 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 
 		}
 
-		public void action() {
+		public int action() {
 
 			// Receive 'cancel' ACL messages.
 			ACLMessage current = receive(cancellationTemplate);
@@ -908,7 +907,8 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 			} else
 				block();
 
-		}
+            return 0;
+        }
 
 	} // End of DeregisterToolBehaviour inner class
 
@@ -994,7 +994,7 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 			});
 		}
 
-		public void action() {
+		public int action() {
 			try {
 				EventRecord er = (EventRecord) eventQueue.get();
 				if (er != null) {
@@ -1016,7 +1016,8 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 				// Should never happen
 				t.printStackTrace();
 			}
-		}
+            return 0;
+        }
 	} // END of EventManager inner class
 
 	private void notifyTools(EventRecord er) throws Exception {
@@ -1499,7 +1500,7 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 	 */
 	private void sendFailureNotification(final Concept action, final Object key, final FIPAException fe) {
 		addBehaviour(new OneShotBehaviour(this) {
-			public void action() {
+			public int action() {
 				ACLMessage notification = null;
 				if (action instanceof CreateAgent) {
 					notification = (ACLMessage) pendingNewAgents.remove(key);
@@ -1522,7 +1523,8 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 					}
 					send(notification);
 				}
-			}
+                return 0;
+            }
 		});
 	}
 

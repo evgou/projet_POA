@@ -26,6 +26,7 @@ package jade.core;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 
+import jade.domain.FIPAException;
 import jade.util.Logger;
 import jade.util.leap.Serializable;
 import jade.util.leap.Iterator;
@@ -1795,7 +1796,7 @@ public class Agent implements Runnable, Serializable
 	 @see jade.core.Agent#addBehaviour(Behaviour b)
 	 @see jade.core.behaviours.Behaviour
 	 */
-	protected void setup() {}
+	protected void setup() throws FIPAException {}
 
 	/**
 	 This protected method is an empty placeholder for application

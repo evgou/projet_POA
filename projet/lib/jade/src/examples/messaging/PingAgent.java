@@ -45,7 +45,7 @@ public class PingAgent extends Agent {
 		
 	protected void setup() {
 		addBehaviour(new CyclicBehaviour(this) {
-			public void action() {
+			public int action() {
 				ACLMessage msg = myAgent.receive(template);
 				if (msg != null) {
 					System.out.println("Received QUERY_IF message from agent "+msg.getSender().getName());
@@ -63,7 +63,8 @@ public class PingAgent extends Agent {
 				else {
 					block();
 				}
-			}
+                return 0;
+            }
 		} );
 	}
 }

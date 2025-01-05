@@ -26,10 +26,7 @@ package jade.domain;
 //#MIDP_EXCLUDE_FILE
 
 import jade.core.behaviours.CyclicBehaviour;
-import jade.content.Concept;
-import jade.content.Predicate;
 import jade.content.onto.basic.Action;
-import jade.content.onto.basic.Done;
 import jade.content.onto.basic.Result;
 import jade.content.onto.OntologyException;
 import jade.content.lang.Codec.CodecException;
@@ -64,7 +61,7 @@ class DFIteratedSearchManagementBehaviour extends CyclicBehaviour {
 		logger = Logger.getMyLogger(theDF.getLocalName());
 	}
 	
-	public void action() {
+	public int action() {
 		ACLMessage msg = theDF.receive(template);
 		if (msg != null) {
 			if (logger.isLoggable(Logger.FINE)) {
@@ -186,6 +183,7 @@ class DFIteratedSearchManagementBehaviour extends CyclicBehaviour {
 		else {
 			block();
 		}
-	}
+        return 0;
+    }
 }
 

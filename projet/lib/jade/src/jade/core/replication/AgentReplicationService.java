@@ -829,10 +829,11 @@ public class AgentReplicationService extends BaseService {
 		if (agent != null) {
 			agent.addBehaviour(new OneShotBehaviour(agent) {
 				@Override
-				public void action() {
+				public int action() {
 					myLogger.log(Logger.CONFIG, "Cloning agent "+myAgent.getLocalName()+" to create replica "+replicaName+" on container "+where.getName());
 					myAgent.doClone(where, replicaName);
-				}
+                    return 0;
+                }
 			});
 			myContainer.releaseLocalAgent(aid);
 		}

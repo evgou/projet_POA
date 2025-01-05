@@ -2,8 +2,6 @@ package jade.core.behaviours;
 
 //#J2ME_EXCLUDE_FILE
 
-import jade.core.behaviours.CyclicBehaviour;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -241,7 +239,7 @@ public class OntologyServer extends CyclicBehaviour {
 		}
 	}
 
-	public final void action() {
+	public final int action() {
 		boolean messageReceived = false;
 		if (maxProcessedMessagesPerRun == 1) {
 			// Process a single message
@@ -271,7 +269,8 @@ public class OntologyServer extends CyclicBehaviour {
 		if (!messageReceived) {
 			block();
 		}
-	}
+        return 0;
+    }
 	
 	protected void handleMessage(ACLMessage msg) {
 		try {

@@ -15,7 +15,6 @@ import jade.util.leap.List;
 import jade.util.leap.ArrayList;
 
 import java.lang.reflect.*;
-import java.io.Serializable;
 
 public class IntrospectionServer extends CyclicBehaviour {
 	private Codec codec;
@@ -62,7 +61,7 @@ public class IntrospectionServer extends CyclicBehaviour {
 				MessageTemplate.MatchPerformative(jade.lang.acl.ACLMessage.REQUEST) );
 	}
 	
-	public void action() {
+	public int action() {
 		jade.lang.acl.ACLMessage request = myAgent.receive(template);
 		if (request != null) {
 			try {
@@ -101,7 +100,8 @@ public class IntrospectionServer extends CyclicBehaviour {
 		else {
 			block();
 		}
-	}
+        return 0;
+    }
 	
 	protected void reply(jade.lang.acl.ACLMessage request, int performative) {
 		jade.lang.acl.ACLMessage msg = request.createReply();

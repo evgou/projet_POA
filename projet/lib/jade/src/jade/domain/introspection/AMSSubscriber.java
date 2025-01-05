@@ -150,7 +150,7 @@ public abstract class AMSSubscriber extends SimpleBehaviour {
 	 */
 	protected abstract void installHandlers(Map handlersTable);
 	
-	public final void action() {
+	public final int action() {
 		if (active) {
 			ACLMessage current = myAgent.receive(listenTemplate);
 			if(current != null) {
@@ -176,7 +176,8 @@ public abstract class AMSSubscriber extends SimpleBehaviour {
 				block();
 			}
 		}
-	}
+        return 0;
+    }
 	
 	public final boolean done() {
 		return !active;

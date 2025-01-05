@@ -48,7 +48,7 @@ public class Receiver extends Agent {
 
 	public boolean done() { return finished; }
 
-	public void action() {
+	public int action() {
 	    for(int c = 0; c < 2; c++) {
 		try {
 		    System.out.println( "[" + getLocalName() + "] Waiting for a message...");
@@ -100,7 +100,8 @@ public class Receiver extends Agent {
 		} catch(Exception e) { e.printStackTrace(); }
 	    }
 	    finished = true;
-	}
+        return 0;
+    }
     }
  
     protected void setup() {

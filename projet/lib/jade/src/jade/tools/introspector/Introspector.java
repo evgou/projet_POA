@@ -29,7 +29,7 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Enumeration;
 import jade.util.leap.List;
-import jade.util.leap.ArrayList;
+
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.HashMap;
@@ -44,7 +44,6 @@ import jade.core.behaviours.*;
 
 import jade.content.AgentAction;
 
-import jade.domain.FIPANames;
 import jade.domain.FIPAService;
 import jade.domain.introspection.*;
 
@@ -62,7 +61,6 @@ import jade.content.onto.basic.Done;
 
 import jade.proto.SimpleAchieveREResponder;
 import jade.proto.SimpleAchieveREInitiator;
-import jade.proto.AchieveREInitiator;
 
 import jade.tools.ToolAgent;
 import jade.tools.introspector.gui.IntrospectorGUI;
@@ -550,7 +548,7 @@ public class Introspector extends ToolAgent {
 			
 		}
 		
-		public void action() {
+		public int action() {
 			
 			ACLMessage message = receive(template);
 			if(message != null) {
@@ -579,7 +577,8 @@ public class Introspector extends ToolAgent {
 			}
 			else
 				block();
-		}
+            return 0;
+        }
 		
 	} // End of inner class IntrospectionListenerBehaviour
 	
@@ -601,7 +600,7 @@ public class Introspector extends ToolAgent {
 					MessageTemplate.MatchConversationId(getName() + "-control"));
 		}
 		
-		public void action() {
+		public int action() {
 			ACLMessage message = receive(template);
 			if(message != null) {
 				try{
@@ -619,7 +618,8 @@ public class Introspector extends ToolAgent {
 			else {
 				block();
 			}
-		}
+            return 0;
+        }
 		
 	} // End of inner class ControlListenerBehaviour
 	

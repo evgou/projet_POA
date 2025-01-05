@@ -28,9 +28,9 @@ package jade.proto;
 import jade.core.*;
 import jade.core.behaviours.*;
 import jade.lang.acl.*;
-import java.util.Date;
+
 import java.util.Vector;
-import java.util.Enumeration;
+
 import jade.util.leap.*;
 
 /**
@@ -124,9 +124,10 @@ public class TwoPh0Initiator extends Initiator {
         // HANDLE_PROPOSE 
         // This state is activated when a propose message is received as a reply
         b = new OneShotBehaviour(myAgent) {
-            public void action() {
+            public int action() {
                 ACLMessage propose = (ACLMessage) getDataStore().get(REPLY_KEY);
                 handlePropose(propose);
+                return 0;
             }
         };
         b.setDataStore(getDataStore());
@@ -136,12 +137,13 @@ public class TwoPh0Initiator extends Initiator {
         // This state is activated when all the responsess have been 
         // received or the specified timeout has expired.
         b = new OneShotBehaviour(myAgent) {
-            public void action() {
+            public int action() {
                 Vector responses = (Vector) getDataStore().get(ALL_RESPONSES_KEY);
                 Vector proposes = (Vector) getDataStore().get(ALL_PROPOSES_KEY);
                 Vector pendings = (Vector) getDataStore().get(ALL_PENDINGS_KEY);
                 Vector nextPhMsgs = (Vector) getDataStore().get(TwoPh0Initiator.this.outputKey);
                 handleAllResponses(responses, proposes, pendings, nextPhMsgs);
+                return 0;
             }
         };
         b.setDataStore(getDataStore());

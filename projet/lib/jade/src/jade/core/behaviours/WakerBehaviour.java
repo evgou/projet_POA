@@ -93,7 +93,7 @@ public abstract class WakerBehaviour extends SimpleBehaviour {
 		finished = false;
 	}
 	
-	public final void action() {
+	public final int action() {
 		if (!finished) {
 			switch (state) {
 			case 0: {
@@ -130,18 +130,22 @@ public abstract class WakerBehaviour extends SimpleBehaviour {
 			}
 			} // end of switch
 		}
+		return 0;
 	} //end of action
 	
 	/**
-	 This method is invoked when the deadline defined in the
-	 constructor is reached (or when the timeout specified in the 
-	 constructor expires).
-	 Subclasses are expected to define this method specifying the action
-	 that must be performed at that time.
-	 */
-	protected void onWake() {
+     * This method is invoked when the deadline defined in the
+     * constructor is reached (or when the timeout specified in the
+     * constructor expires).
+     * Subclasses are expected to define this method specifying the action
+     * that must be performed at that time.
+     *
+     * @return
+     */
+	protected int onWake() {
 		handleElapsedTimeout();
-	}
+        return 0;
+    }
 	
 	/**
 	 * @deprecated Use onWake() instead

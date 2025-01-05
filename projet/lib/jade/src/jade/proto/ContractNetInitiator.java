@@ -28,15 +28,9 @@ package jade.proto;
 import jade.core.*;
 import jade.core.behaviours.*;
 import jade.lang.acl.*;
-import jade.proto.states.MsgReceiver;
-import java.util.Date;
+
 import java.util.Vector;
-import java.util.Enumeration;
-import jade.util.leap.Iterator;
-import jade.util.leap.Map;
-import jade.util.leap.HashMap;
-import jade.util.leap.List;
-import jade.util.leap.ArrayList;
+
 import jade.util.leap.Serializable;
 
 /**
@@ -228,11 +222,12 @@ public class ContractNetInitiator extends Initiator {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895819003L;
 
-			public void action() {
+			public int action() {
 				Vector acceptances = (Vector) getDataStore().get(ALL_ACCEPTANCES_KEY);
 				ACLMessage propose = (ACLMessage) getDataStore().get(REPLY_K);
 				handlePropose(propose, acceptances);
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());		
 		registerState(b, HANDLE_PROPOSE);
@@ -241,9 +236,10 @@ public class ContractNetInitiator extends Initiator {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895819004L;
 
-			public void action() {
+			public int action() {
 				handleRefuse((ACLMessage) getDataStore().get(REPLY_K));
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());		
 		registerState(b, HANDLE_REFUSE);
@@ -252,9 +248,10 @@ public class ContractNetInitiator extends Initiator {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818006L;
 
-			public void action() {
+			public int action() {
 				handleInform((ACLMessage) getDataStore().get(REPLY_K));
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());		
 		registerState(b, HANDLE_INFORM);
@@ -262,11 +259,12 @@ public class ContractNetInitiator extends Initiator {
 		// HANDLE_ALL_RESPONSES
 		b = new OneShotBehaviour(myAgent) {
 
-			public void action() {
+			public int action() {
 				Vector responses = (Vector) getDataStore().get(ALL_RESPONSES_KEY);
 				Vector acceptances = (Vector) getDataStore().get(ALL_ACCEPTANCES_KEY);
 				handleAllResponses(responses, acceptances);
-			}
+                return 0;
+            }
 		};
 		b.setDataStore(getDataStore());		
 		registerState(b, HANDLE_ALL_RESPONSES);
@@ -274,9 +272,10 @@ public class ContractNetInitiator extends Initiator {
 		// HANDLE_ALL_RESULT_NOTIFICATIONS
 		b = new OneShotBehaviour(myAgent) {
 
-			public void action() {
+			public int action() {
 				handleAllResultNotifications((Vector) getDataStore().get(ALL_RESULT_NOTIFICATIONS_KEY));
-			}
+                return 0;
+            }
 			public int onEnd() {
 				return moreAcceptancesToSend ? MORE_ACCEPTANCES : super.onEnd();
 			}

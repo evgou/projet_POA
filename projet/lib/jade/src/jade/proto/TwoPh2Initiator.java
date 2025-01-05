@@ -29,8 +29,7 @@ import jade.core.*;
 import jade.core.behaviours.*;
 import jade.lang.acl.*;
 import java.util.Vector;
-import java.util.Enumeration;
-import java.util.Date;
+
 import jade.util.leap.*;
 
 /**
@@ -124,7 +123,7 @@ public class TwoPh2Initiator extends Initiator {
         // to network delay). 
         b = new OneShotBehaviour(myAgent) {
             int ret;
-            public void action() {
+            public int action() {
                 ACLMessage reply = (ACLMessage) getDataStore().get(REPLY_K);
                 String inReplyTo = reply.getInReplyTo();
                 String phase = inReplyTo.substring(inReplyTo.length() - 3);;
@@ -141,6 +140,7 @@ public class TwoPh2Initiator extends Initiator {
                 		ret = -1;
                 	}
                 }
+                return 0;
             }
 
             public int onEnd() {
@@ -154,9 +154,10 @@ public class TwoPh2Initiator extends Initiator {
         conversationId and a receiver of one of accept/reject-proposal messages sent. */
         b = new OneShotBehaviour(myAgent) {
             int ret = -1;
-            public void action() {
+            public int action() {
                 ACLMessage inform = (ACLMessage) (getDataStore().get(REPLY_KEY));
                 handleInform(inform);
+                return 0;
             }
         };
         b.setDataStore(getDataStore());
@@ -166,9 +167,10 @@ public class TwoPh2Initiator extends Initiator {
         from phase 0 (timeout expired), a disconfirm or inform message coming from phase 1
         (timeout expired). */
         b = new OneShotBehaviour(myAgent) {
-            public void action() {
+            public int action() {
                 ACLMessage old = (ACLMessage) (getDataStore().get(REPLY_KEY));
                 handleOldResponse(old);
+                return 0;
             }
         };
         b.setDataStore(getDataStore());
@@ -176,9 +178,10 @@ public class TwoPh2Initiator extends Initiator {
 
         /* HANDLE_ALL_RESPONSES state activated when all the answers have been received. */
         b = new OneShotBehaviour(myAgent) {
-            public void action() {
+            public int action() {
                 Vector responses = (Vector) getDataStore().get(ALL_RESPONSES_KEY);
                 handleAllResponses(responses);
+                return 0;
             }
         };
         b.setDataStore(getDataStore());
