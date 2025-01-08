@@ -45,7 +45,7 @@ public class RestoreAgent extends Agent {
 		});
 		
 		addBehaviour(new CyclicBehaviour(this) {
-			public int action() {
+			public void action() {
 				ACLMessage msg = myAgent.receive();
 				if (msg != null) {
 					if (msg.getPerformative() == ACLMessage.INFORM) {

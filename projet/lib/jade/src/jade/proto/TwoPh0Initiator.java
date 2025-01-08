@@ -124,7 +124,7 @@ public class TwoPh0Initiator extends Initiator {
         // HANDLE_PROPOSE 
         // This state is activated when a propose message is received as a reply
         b = new OneShotBehaviour(myAgent) {
-            public int action() {
+            public void action() {
                 ACLMessage propose = (ACLMessage) getDataStore().get(REPLY_KEY);
                 handlePropose(propose);
                 return 0;
@@ -137,7 +137,7 @@ public class TwoPh0Initiator extends Initiator {
         // This state is activated when all the responsess have been 
         // received or the specified timeout has expired.
         b = new OneShotBehaviour(myAgent) {
-            public int action() {
+            public void action() {
                 Vector responses = (Vector) getDataStore().get(ALL_RESPONSES_KEY);
                 Vector proposes = (Vector) getDataStore().get(ALL_PROPOSES_KEY);
                 Vector pendings = (Vector) getDataStore().get(ALL_PENDINGS_KEY);

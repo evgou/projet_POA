@@ -120,7 +120,7 @@ abstract class Responder extends FSMBehaviour {
 	private CheckInSeq() {
 	}
 
-	public int action() {
+	public void action() {
 	    Responder fsm = (Responder)getParent();
 	    ACLMessage received = (ACLMessage)getDataStore().get(fsm.RECEIVED_KEY);
 	    if (fsm.checkInSequence(received)) {
@@ -150,7 +150,7 @@ abstract class Responder extends FSMBehaviour {
 	private HandleOutOfSeq() {
 	}
 
-	public int action() {
+	public void action() {
 	    Responder fsm = (Responder)getParent();
 	    fsm.handleOutOfSequence((ACLMessage)getDataStore().get(fsm.RECEIVED_KEY));
         return 0;

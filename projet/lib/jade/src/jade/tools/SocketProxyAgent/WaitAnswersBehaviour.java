@@ -100,10 +100,8 @@ class WaitAnswersBehaviour extends SimpleBehaviour {
      * behaviour action
      * blocking receive for message, followed by copying that message
      * to the output stream.
-     *
-     * @return
      */
-    public int action() {
+    public void action() {
 	if ( logger.isLoggable( Logger.FINE ) ) {
 	    logger.log( Logger.FINE, 
                 myThreadName + ": About to block, message template "+ mt +

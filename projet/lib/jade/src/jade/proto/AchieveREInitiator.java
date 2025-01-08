@@ -177,7 +177,7 @@ public class AchieveREInitiator extends Initiator {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818003L;
 			
-			public int action() {
+			public void action() {
 				handleAgree((ACLMessage) getDataStore().get(REPLY_K));
                 return 0;
             }
@@ -189,7 +189,7 @@ public class AchieveREInitiator extends Initiator {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818004L;
 			
-			public int action() {
+			public void action() {
 				handleRefuse((ACLMessage) getDataStore().get(REPLY_K));
                 return 0;
             }
@@ -201,7 +201,7 @@ public class AchieveREInitiator extends Initiator {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818006L;
 			
-			public int action() {
+			public void action() {
 				handleInform((ACLMessage) getDataStore().get(REPLY_K));
                 return 0;
             }
@@ -212,7 +212,7 @@ public class AchieveREInitiator extends Initiator {
 		// HANDLE_ALL_RESPONSES
 		b = new OneShotBehaviour(myAgent) {
 			
-			public int action() {
+			public void action() {
 				handleAllResponses((Vector) getDataStore().get(ALL_RESPONSES_KEY));
                 return 0;
             }
@@ -223,7 +223,7 @@ public class AchieveREInitiator extends Initiator {
 		// HANDLE_ALL_RESULT_NOTIFICATIONS
 		b = new OneShotBehaviour(myAgent) {
 			
-			public int action() {
+			public void action() {
 				handleAllResultNotifications((Vector) getDataStore().get(ALL_RESULT_NOTIFICATIONS_KEY));
                 return 0;
             }
@@ -233,7 +233,7 @@ public class AchieveREInitiator extends Initiator {
 		
 		// CHECK_AGAIN
 		b = new OneShotBehaviour(myAgent) {
-			public int action() {
+			public void action() {
                 return 0;
             }
 			public int onEnd() {

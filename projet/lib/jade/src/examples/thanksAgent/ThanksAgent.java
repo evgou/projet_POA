@@ -141,7 +141,7 @@ public class ThanksAgent extends Agent {
 		// if an ANSWER to a greetings message is arrived 
 		// then send a THANKS message
 		addBehaviour(new CyclicBehaviour(this) {
-			public int action() {
+			public void action() {
 				// listen if a greetings message arrives
 				ACLMessage msg = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 				if (msg != null) {

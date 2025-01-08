@@ -196,7 +196,7 @@ public class TwoPhInitiator extends FSMBehaviour {
 
         /* DUMMY_FINAL */
         b = new OneShotBehaviour(myAgent) {
-            public int action() {
+            public void action() {
                 return 0;
             }
         };

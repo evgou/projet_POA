@@ -40,7 +40,7 @@ public abstract class SensorManager extends CyclicBehaviour {
 		s.setManager(this);
 	}
 	
-	public int action() {
+	public void action() {
 		Event ev = mySensor.get();
 		if (ev != null) {
 			onEvent(ev);

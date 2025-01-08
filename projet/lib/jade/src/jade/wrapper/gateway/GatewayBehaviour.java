@@ -29,7 +29,7 @@ public abstract class GatewayBehaviour extends CyclicBehaviour {
 
 	private final Logger myLogger = Logger.getMyLogger(this.getClass().getName());
 
-	public int action() {
+	public void action() {
 		Event e = (Event) myAgent.getO2AObject();
 		if (e == null) {
 			block();

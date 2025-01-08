@@ -222,7 +222,7 @@ public class ContractNetInitiator extends Initiator {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895819003L;
 
-			public int action() {
+			public void action() {
 				Vector acceptances = (Vector) getDataStore().get(ALL_ACCEPTANCES_KEY);
 				ACLMessage propose = (ACLMessage) getDataStore().get(REPLY_K);
 				handlePropose(propose, acceptances);
@@ -236,7 +236,7 @@ public class ContractNetInitiator extends Initiator {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895819004L;
 
-			public int action() {
+			public void action() {
 				handleRefuse((ACLMessage) getDataStore().get(REPLY_K));
                 return 0;
             }
@@ -248,7 +248,7 @@ public class ContractNetInitiator extends Initiator {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818006L;
 
-			public int action() {
+			public void action() {
 				handleInform((ACLMessage) getDataStore().get(REPLY_K));
                 return 0;
             }
@@ -259,7 +259,7 @@ public class ContractNetInitiator extends Initiator {
 		// HANDLE_ALL_RESPONSES
 		b = new OneShotBehaviour(myAgent) {
 
-			public int action() {
+			public void action() {
 				Vector responses = (Vector) getDataStore().get(ALL_RESPONSES_KEY);
 				Vector acceptances = (Vector) getDataStore().get(ALL_ACCEPTANCES_KEY);
 				handleAllResponses(responses, acceptances);
@@ -272,7 +272,7 @@ public class ContractNetInitiator extends Initiator {
 		// HANDLE_ALL_RESULT_NOTIFICATIONS
 		b = new OneShotBehaviour(myAgent) {
 
-			public int action() {
+			public void action() {
 				handleAllResultNotifications((Vector) getDataStore().get(ALL_RESULT_NOTIFICATIONS_KEY));
                 return 0;
             }

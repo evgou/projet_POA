@@ -238,7 +238,7 @@ public class ThreadedBehaviourFactory {
 			myThread.start();			
 		}
 		
-		public int action() {
+		public void action() {
 			if (!finished) {
 				block();
 			}

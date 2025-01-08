@@ -102,7 +102,7 @@ public class BookBuyerAgent extends Agent {
 		private MessageTemplate mt; // The template to receive replies
 		private int step = 0;
 
-		public int action() {
+		public void action() {
 			switch (step) {
 			case 0:
 				// Send the cfp to all sellers

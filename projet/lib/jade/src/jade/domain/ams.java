@@ -742,7 +742,7 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 
 		}
 
-		public int action() {
+		public void action() {
 
 			// Receive 'subscribe' ACL messages.
 			ACLMessage current = receive(subscriptionTemplate);
@@ -894,7 +894,7 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 
 		}
 
-		public int action() {
+		public void action() {
 
 			// Receive 'cancel' ACL messages.
 			ACLMessage current = receive(cancellationTemplate);
@@ -994,7 +994,7 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 			});
 		}
 
-		public int action() {
+		public void action() {
 			try {
 				EventRecord er = (EventRecord) eventQueue.get();
 				if (er != null) {
@@ -1500,7 +1500,7 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 	 */
 	private void sendFailureNotification(final Concept action, final Object key, final FIPAException fe) {
 		addBehaviour(new OneShotBehaviour(this) {
-			public int action() {
+			public void action() {
 				ACLMessage notification = null;
 				if (action instanceof CreateAgent) {
 					notification = (ACLMessage) pendingNewAgents.remove(key);

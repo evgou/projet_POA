@@ -108,11 +108,9 @@ public class LoaderBehaviour extends Behaviour {
 	}
 	
 	/**
-	 * The action() method is redefined to serve behaviour loading requests
-	 *
-	 * @return
-	 */
-	public final int action() {
+     * The action() method is redefined to serve behaviour loading requests
+     */
+	public final void action() {
 		if (!finished) {
 			ACLMessage msg = myAgent.receive(myTemplate);
 			if (msg != null) {
@@ -384,7 +382,7 @@ public class LoaderBehaviour extends Behaviour {
 			request = m;
 		}
 		
-		public int action() {
+		public void action() {
 			// Avoid sending back the behaviour code
 			LoadBehaviour lb = (LoadBehaviour) actionExpr.getAction();
 			lb.setCode(null);

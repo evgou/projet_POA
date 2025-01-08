@@ -45,7 +45,7 @@ public class TopicMessageReceiverAgent extends Agent {
 			
 			// Add a behaviour collecting messages about topic "JADE"
 			addBehaviour(new CyclicBehaviour(this) {
-				public int action() {
+				public void action() {
 					ACLMessage msg = myAgent.receive(MessageTemplate.MatchTopic(topic));
 					if (msg != null) {
 						System.out.println("Agent "+myAgent.getLocalName()+": Message about topic "+topic.getLocalName()+" received. Content is "+msg.getContent());

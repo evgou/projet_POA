@@ -77,7 +77,7 @@ public class InProcessTest {
       // Add a suitable cyclic behaviour...
       addBehaviour(new jade.core.behaviours.CyclicBehaviour() {
 
-	public int action() {
+	public void action() {
 	  // Retrieve the first object in the queue and print it on
 	  // the standard output
 	  Object obj = getO2AObject();

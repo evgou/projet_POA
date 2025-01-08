@@ -111,7 +111,7 @@ public class WrapperBehaviour extends Behaviour {
 		wrappedBehaviour.onStart();
 	}
 	
-	public int action() {
+	public void action() {
 		wrappedBehaviour.action();
         return 0;
     }

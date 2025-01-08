@@ -165,7 +165,7 @@ public class SimpleAchieveREInitiator extends SimpleBehaviour{
     }
 
 
-    public final int action(){
+    public final void action(){
 
 	switch(state){
 	case PREPARE_MSG_STATE:{

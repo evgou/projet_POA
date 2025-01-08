@@ -85,7 +85,7 @@ public class IteratedAchieveREInitiator extends AchieveREInitiator {
 		
 		// REINIT
 		b = new OneShotBehaviour(myAgent) {
-			public int action() {
+			public void action() {
 				prepareForNextRound();
                 return 0;
             }

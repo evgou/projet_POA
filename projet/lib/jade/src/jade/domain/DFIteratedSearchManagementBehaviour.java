@@ -61,7 +61,7 @@ class DFIteratedSearchManagementBehaviour extends CyclicBehaviour {
 		logger = Logger.getMyLogger(theDF.getLocalName());
 	}
 	
-	public int action() {
+	public void action() {
 		ACLMessage msg = theDF.receive(template);
 		if (msg != null) {
 			if (logger.isLoggable(Logger.FINE)) {

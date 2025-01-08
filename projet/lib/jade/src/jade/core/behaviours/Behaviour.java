@@ -278,10 +278,9 @@ public abstract class Behaviour implements Serializable {
 	 * long and slow task into smaller section, recursive behaviour
 	 * aggregation may be used.
 	 *
-	 * @return
 	 * @see jade.core.behaviours.CompositeBehaviour
 	 */
-	public abstract int action();
+	public abstract void action();
 	
 	/**
 	 Check if this behaviour is done. The agent scheduler calls this

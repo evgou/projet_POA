@@ -47,7 +47,7 @@ public class GatewayAgent extends Agent {
 			SequentialBehaviour sb = new SequentialBehaviour(this);
 			sb.addSubBehaviour((Behaviour) command);
 			sb.addSubBehaviour(new OneShotBehaviour(this) {
-				public int action() {
+				public void action() {
 					GatewayAgent.this.releaseCommand(command);
                     return 0;
                 }

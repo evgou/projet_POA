@@ -86,7 +86,7 @@ public class FSMAgent extends Agent {
 	   This behaviour just prints its name
 	 */
 	private class NamePrinter extends OneShotBehaviour {
-		public int action() {
+		public void action() {
 			System.out.println("Executing behaviour "+getBehaviourName());
             return 0;
         }
@@ -106,7 +106,7 @@ public class FSMAgent extends Agent {
 			maxExitValue = max;
 		}
 		
-		public int action() {
+		public void action() {
 			System.out.println("Executing behaviour "+getBehaviourName());
 			exitValue = (int) (Math.random() * maxExitValue);
 			System.out.println("Exit value is "+exitValue);

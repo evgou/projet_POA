@@ -189,7 +189,7 @@ public class Sniffer extends ToolAgent {
 			listenSniffTemplate = MessageTemplate.MatchConversationId(getName() + "-event");
 		}
 
-		public int action() {
+		public void action() {
 
 			ACLMessage current = receive(listenSniffTemplate);
 			if(current != null) {

@@ -45,7 +45,7 @@ public class ComplexBehaviourAgent extends Agent {
       myStep = step;
     }
 
-    public int action() {
+    public void action() {
       System.out.println("Agent "+getName()+": Step "+myStep);
         return 0;
     }

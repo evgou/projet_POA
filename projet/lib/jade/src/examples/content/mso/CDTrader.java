@@ -130,7 +130,7 @@ public class CDTrader extends Agent {
 			this.it = it;
 		}
 
-		public int action() {
+		public void action() {
 			try {
 				System.out.println("\nSELLER: Inform BUYER that I own " + it);
 
@@ -166,7 +166,7 @@ public class CDTrader extends Agent {
 			super(a);
 		}
 
-		public int action() {
+		public void action() {
 			ACLMessage msg = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 			if (msg != null) {
 				System.out.println("\nBUYER: Information received from SELLER. Message is");
@@ -246,7 +246,7 @@ public class CDTrader extends Agent {
 			this.it = it;
 		}
 
-		public int action() {
+		public void action() {
 			try {
 				System.out.println("\nBUYER: Query price of " + it);
 
@@ -290,7 +290,7 @@ public class CDTrader extends Agent {
 			super(a);
 		}
 
-		public int action() {
+		public void action() {
 			ACLMessage msg = receive(MessageTemplate.MatchPerformative(ACLMessage.QUERY_REF));
 			if (msg != null) {
 				try {
@@ -335,7 +335,7 @@ public class CDTrader extends Agent {
 			this.it = it;
 		}
 
-		public int action() {
+		public void action() {
 			try {
 				System.out.println("\nSELLER: Inform Buyer about price of item " + it);
 
@@ -385,7 +385,7 @@ public class CDTrader extends Agent {
 			this.it = it;
 		}
 
-		public int action() {
+		public void action() {
 			try {
 				System.out.println("\nBUYER: Request seller to sell item " + it);
 
@@ -425,7 +425,7 @@ public class CDTrader extends Agent {
 			super(a);
 		}
 
-		public int action() {
+		public void action() {
 			ACLMessage msg = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
 			if (msg != null) {
 				try {
@@ -463,7 +463,7 @@ public class CDTrader extends Agent {
 			this.act = act;
 		}
 
-		public int action() {
+		public void action() {
 			try {
 				System.out.println("\nSELLER: Inform Buyer that the requested operation has been completed");
 

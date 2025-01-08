@@ -213,10 +213,8 @@ public class BasicJessBehaviour extends CyclicBehaviour {
 
     /**
      * executes the behaviour
-     *
-     * @return
      */
-    public int action() {
+    public void action() {
         ACLMessage msg; // to keep the ACLMessage
 
         // wait a message

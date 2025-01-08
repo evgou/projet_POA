@@ -118,7 +118,7 @@ public class SimpleAchieveREResponder extends SimpleBehaviour implements FIPANam
 
 	//#APIDOC_EXCLUDE_BEGIN
 
-	public final int action(){
+	public final void action(){
 
 		switch(state){
 		case WAITING_MSG_STATE:{

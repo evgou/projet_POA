@@ -111,14 +111,13 @@ public class Vendeur extends Agent {
      * SendPrice envoie le prix de base au marché
      */
     private class SendPrice extends OneShotBehaviour {
-        public int action() {
+        public void action() {
             // TODO : envoie de l'enchère au marché avec un message CFP qui contient le prix
             logger.info("Arrivé dans la classe SendPrice.");
             ACLMessage msg = new ACLMessage(ACLMessage.CFP);
             msg.setContent(String.valueOf(price));
             msg.addReceiver(new AID("market", AID.ISLOCALNAME));
             send(msg);
-            return 0;
         }
     }
 
@@ -155,7 +154,7 @@ public class Vendeur extends Agent {
      *   on va donc vers l'état SendInform pour l'en informer
      */
     private class ReceivedPropose extends OneShotBehaviour {
-        public int action() {
+        public void action() {
             logger.info("Arrivé dans la classe ReceivedPropose.");
             // Vérification si un deuxième message est arrivé
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.PROPOSE);
@@ -175,7 +174,7 @@ public class Vendeur extends Agent {
      *
      */
     private class HandleRefuse extends OneShotBehaviour {
-        public int action() {
+        public void action() {
             logger.info("Arrivé dans la classe HandleRefuse.");
             // Augmentation du prix car plusieurs preneurs
             price = price + pas;
@@ -198,21 +197,18 @@ public class Vendeur extends Agent {
      * et envoie un message INFORM à cet agent preneur (pour REP_BID_OK)
      */
     private class SendInform extends OneShotBehaviour {
-        public int action() {
+        public void action() {
             logger.info("Arrivé dans la classe SendInform.");
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.PROPOSE);
             ACLMessage msg = myAgent.receive(mt);
             if (msg != null) {
-                ACLMessage
-
-                ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                msg.addReceiver(preneur);
-                send(msg);
+                ACLMessage msgInform = new ACLMessage(ACLMessage.INFORM);
+                msgInform.addReceiver(preneur);
+                send(msgInform);
             }
             else {
                 block();
             }
-            return 0;
         }
     }
 
@@ -220,12 +216,11 @@ public class Vendeur extends Agent {
      * <b>SendAcceptProposal</b> envoie un message ACCCEPT_PROPOSAL au preneur choisi
      */
     private class SendAcceptProposal extends OneShotBehaviour {
-        public int action() {
+        public void action() {
             logger.info("Arrivé dans la classe SendAcceptProposal.");
             ACLMessage msg = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
             msg.addReceiver(new AID("preneur", AID.ISLOCALNAME));
             send(msg);
-            return 0;
         }
     }
 
@@ -233,14 +228,13 @@ public class Vendeur extends Agent {
      * <b>ReceivedConfirm</b> vérifie que le preneur confirme bien le message ACCEPT_PROPOSAL que le vendeur lui a envoyé
      */
     private class ReceivedConfirm extends OneShotBehaviour {
-        public int action() {
+        public void action() {
             logger.info("Arrivé dans la classe ReceivedConfirm.");
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CONFIRM);
             ACLMessage msg = myAgent.receive(mt);
             if (msg == null) {
                 block();
             }
-            return 0;
         }
     }
 
@@ -248,7 +242,7 @@ public class Vendeur extends Agent {
      * <b>SendAgree</b> envoie un message AGREE au marché avec comme contenu le poisson et supprime l'agent
      */
     private class SendAgree extends OneShotBehaviour {
-        public int action() {
+        public void action() {
             logger.info("Arrivé dans la classe SendAgree.");
             // Envoie le message AGREE (TO_GIVE) au marché pour l'informer de la fin de l'enchère
             ACLMessage msg = new ACLMessage(ACLMessage.AGREE);
@@ -257,7 +251,6 @@ public class Vendeur extends Agent {
             msg.addReceiver(new AID("market", AID.ISLOCALNAME));
             send(msg);
             doDelete();
-            return 0;
         }
     }
 

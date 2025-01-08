@@ -29,7 +29,7 @@ public class AliasAgent extends Agent {
 		}
 		
 		addBehaviour(new CyclicBehaviour() {
-			public int action() {
+			public void action() {
 				ACLMessage msg = myAgent.receive();
 				if (msg != null) {
 					System.out.println("Received message from agent "+msg.getSender().getLocalName()+". Reply...");
