@@ -1,5 +1,5 @@
 #Permet d'accéder plus facilement à nos classes
-export CLASSPATH=.:../lib/jade/lib/jade.jar:../lib/jade/lib/commons-codec/commons-codec-1.3.jar:../classes
+export CLASSPATH=.:../lib/jade/lib/jade.jar:../lib/jade/lib/commons-codec/commons-codec-1.3.jar:../classes:$CLASSPATH
 
 #Compile et exécute l'agent Preneur
 #javac -d ../classes ../preneur/PreneurAgent.java
@@ -11,4 +11,4 @@ export CLASSPATH=.:../lib/jade/lib/jade.jar:../lib/jade/lib/commons-codec/common
 
 # Compile et exécute l'agent PreneurAgent
 javac -d ../classes ../preneur/PreneurAgent.java ../preneur/PreneurAgentGUI.java
-java jade.Boot -gui -agents "A1:preneur.PreneurAgent(Rocher)"
+java jade.Boot -gui -agents "Pierre:preneur.PreneurAgent(Rocher);Paul:preneur.PreneurAgent(Paulo)"

@@ -16,8 +16,8 @@ public class PreneurAgent extends GuiAgent {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			myName = (String) args[0];
-			//gui = new
-
+			PreneurAgentGUI gui = new PreneurAgentGUI(this);
+			gui.showGui();
 		}
 		else {
 			// Make the agent terminate
