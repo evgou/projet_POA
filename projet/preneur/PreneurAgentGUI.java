@@ -4,19 +4,34 @@ import jade.gui.GuiAgent;
 import jade.gui.GuiEvent;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalIconFactory;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.Objects;
+import java.util.logging.Logger;
+
 
 public class PreneurAgentGUI extends JFrame {
     private final PreneurAgent agent;
     private JTextArea logArea;
     private JTextField commandField;
+    private static final Logger logger = Logger.getLogger(PreneurAgentGUI.class.getName());
+
 
     public PreneurAgentGUI(PreneurAgent agent) {
         this.agent = agent;
+
+        ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/javax/swing/plaf/metal/icons/Folder.gif")));
+        setIconImage(icon.getImage());
+
         setTitle(agent.getLocalName());
-        setSize(400, 300);
+        setSize(1000, 300);
+        //setIconImage(Toolkit.getDefaultToolkit().getImage("/home/alicia/Documents/M2/POA/projet_POA/projet/misc/images/poisson.png"));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        logger.info("Je suis là");
+
 
         logArea = new JTextArea();
         logArea.setEditable(false);

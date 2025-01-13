@@ -1,5 +1,6 @@
 package preneur;
 
+import jade.core.behaviours.FSMBehaviour;
 import jade.gui.GuiAgent;
 import jade.gui.GuiEvent;
 
@@ -8,6 +9,7 @@ import java.util.logging.Logger;
 public class PreneurAgent extends GuiAgent {
 
 	private String myName;
+	private float budget;
 	private static final Logger logger = Logger.getLogger(PreneurAgent.class.getName());
 
 	protected void setup() {
@@ -28,6 +30,14 @@ public class PreneurAgent extends GuiAgent {
 
 	protected void takeDown() {
 		System.out.println("Agent "+getAID().getName()+" terminating.");
+	}
+
+	protected void automate(){
+		FSMBehaviour automatePreneur = new FSMBehaviour();
+
+		//On définit les états de l'agent Preneur
+		//automatePreneur.registerFirstState("Départ");
+
 	}
 
 	@Override
