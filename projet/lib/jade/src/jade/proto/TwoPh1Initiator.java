@@ -150,7 +150,7 @@ public class TwoPh1Initiator extends Initiator {
         /* HANDLE_CONFIRM state activated if arrived a confirm message compliant with
         conversationId and a receiver of one of queryIf messages sent. */
         b = new OneShotBehaviour(myAgent) {
-            public void action() {
+            public int action() {
                 ACLMessage confirm = (ACLMessage) (getDataStore().get(REPLY_KEY));
                 handleConfirm(confirm);
                 return 0;
@@ -163,7 +163,7 @@ public class TwoPh1Initiator extends Initiator {
         compliant with conversationId and a receiver of one of queryIf messages
         sent. */
         b = new OneShotBehaviour(myAgent) {
-            public void action() {
+            public int action() {
                 ACLMessage disconfirm = (ACLMessage) (getDataStore().get(REPLY_KEY));
                 handleDisconfirm(disconfirm);
                 return 0;
@@ -176,7 +176,7 @@ public class TwoPh1Initiator extends Initiator {
         compliant with conversationId and a receiver of one of queryIf messages
         sent. */
         b = new OneShotBehaviour(myAgent) {
-            public void action() {
+            public int action() {
                 ACLMessage inform = (ACLMessage) (getDataStore().get(REPLY_KEY));
                 handleInform(inform);
                 return 0;
@@ -188,7 +188,7 @@ public class TwoPh1Initiator extends Initiator {
         /* HANDLE_ALL_RESPONSES state activated when timeout is expired or
         all the answers have been received. */
         b = new OneShotBehaviour(myAgent) {
-            public void action() {
+            public int action() {
                 Vector responses = (Vector) getDataStore().get(ALL_RESPONSES_KEY);
                 Vector confirms = (Vector) getDataStore().get(ALL_CONFIRMS_KEY);
                 Vector disconfirms = (Vector) getDataStore().get(ALL_DISCONFIRMS_KEY);

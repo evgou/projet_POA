@@ -235,7 +235,7 @@ public class SSIteratedAchieveREResponder extends SSResponder {
 			super(a);
 		}
 		
-		public void action() {
+		public int action() {
 			SSIteratedAchieveREResponder parent = (SSIteratedAchieveREResponder) getParent();
 			ACLMessage reply = null;
 			try {
@@ -260,7 +260,7 @@ public class SSIteratedAchieveREResponder extends SSResponder {
 			super(a);
 		}
 		
-		public void action() {
+		public int action() {
 			SSIteratedAchieveREResponder parent = (SSIteratedAchieveREResponder) getParent();
 			parent.handleCancel((ACLMessage) getDataStore().get(parent.CANCEL_KEY));
             return 0;

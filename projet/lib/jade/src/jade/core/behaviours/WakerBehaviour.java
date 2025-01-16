@@ -93,7 +93,7 @@ public abstract class WakerBehaviour extends SimpleBehaviour {
 		finished = false;
 	}
 	
-	public final void action() {
+	public final int action() {
 		if (!finished) {
 			switch (state) {
 			case 0: {

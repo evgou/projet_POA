@@ -56,7 +56,7 @@ public class StateResetter extends OneShotBehaviour{
 		this(null);
 	}
 	
-	public void action() {
+	public int action() {
 		Behaviour st;
 		FSMBehaviour p = (FSMBehaviour)parent;
 		if(sname == null){

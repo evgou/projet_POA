@@ -109,7 +109,7 @@ abstract class Initiator extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818000L;
 			
-			public void action() {
+			public int action() {
 				DataStore ds = getDataStore();
 				Vector allInitiations = (Vector) ds.get(ALL_INITIATIONS_K);
 				if (allInitiations == null || allInitiations.size() == 0) {
@@ -126,7 +126,7 @@ abstract class Initiator extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818001L;
 			
-			public void action() {
+			public int action() {
 				Vector allInitiations = (Vector) getDataStore().get(ALL_INITIATIONS_K);
 				if (allInitiations != null) {
 					sendInitiations(allInitiations);
@@ -149,7 +149,7 @@ abstract class Initiator extends FSMBehaviour {
 			int ret;
 			private static final long     serialVersionUID = 3487495895818002L;
 			
-			public void action() {
+			public int action() {
 				ACLMessage reply = (ACLMessage) getDataStore().get(REPLY_K);
 				if (checkInSequence(reply)) {
 					ret = reply.getPerformative();
@@ -170,7 +170,7 @@ abstract class Initiator extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818005L;
 			
-			public void action() {
+			public int action() {
 				handleNotUnderstood((ACLMessage) getDataStore().get(REPLY_K));
                 return 0;
             }
@@ -182,7 +182,7 @@ abstract class Initiator extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818007L;
 			
-			public void action() {
+			public int action() {
 				handleFailure((ACLMessage) getDataStore().get(REPLY_K));
                 return 0;
             }
@@ -194,7 +194,7 @@ abstract class Initiator extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818008L;
 			
-			public void action() {
+			public int action() {
 				handleOutOfSequence((ACLMessage) getDataStore().get(REPLY_K));
                 return 0;
             }
@@ -207,7 +207,7 @@ abstract class Initiator extends FSMBehaviour {
 			int ret;
 			private static final long     serialVersionUID = 3487495895818009L;
 			
-			public void action() {
+			public int action() {
 				ACLMessage reply = (ACLMessage) getDataStore().get(REPLY_K);
 				ret = checkSessions(reply);
                 return 0;
@@ -223,7 +223,7 @@ abstract class Initiator extends FSMBehaviour {
 		b = new OneShotBehaviour(myAgent) {
 			private static final long     serialVersionUID = 3487495895818010L;
 			
-			public void action() {
+			public int action() {
                 return 0;
             }
 		};

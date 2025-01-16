@@ -85,8 +85,10 @@ public abstract class CompositeBehaviour extends Behaviour {
      * defined by concrete subclasses that implements
      * the <code>scheduleFirst()</code> and <code>scheduleNext()</code>
      * methods.
+     *
+     * @return
      */
-	public final void action() {
+	public final int action() {
 		if(starting) {
 			scheduleFirst();
 			starting = false;

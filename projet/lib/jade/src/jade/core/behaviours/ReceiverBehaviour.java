@@ -271,8 +271,10 @@ public final class ReceiverBehaviour extends Behaviour {
    * ACL message and copies it into the message provided by the
    * behaviour creator. It blocks the current behaviour if no suitable
    * message is available.
+   *
+   * @return
    */
-  public void action() {
+  public int action() {
     ACLMessage msg = null;
     if(template == null)
       msg = myAgent.receive();

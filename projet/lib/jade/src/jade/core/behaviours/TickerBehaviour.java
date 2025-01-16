@@ -61,7 +61,7 @@ public abstract class TickerBehaviour extends SimpleBehaviour {
 		wakeupTime =  startTime + period;
 	}
 	
-	public final void action() {
+	public final int action() {
 		// Someone else may have stopped us in the meanwhile
 		if (!finished) {
 			long blockTime = wakeupTime - System.currentTimeMillis();

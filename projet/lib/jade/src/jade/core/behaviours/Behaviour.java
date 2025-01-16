@@ -268,19 +268,20 @@ public abstract class Behaviour implements Serializable {
 	}
 	
 	/**
-	 * Runs the behaviour. This abstract method must be implemented by
-	 * <code>Behaviour</code>subclasses to perform ordinary behaviour
-	 * duty. An agent schedules its behaviours calling their
-	 * <code>action()</code> method; since all the behaviours belonging
-	 * to the same agent are scheduled cooperatively, this method
-	 * <b>must not</b> enter in an endless loop and should return as
-	 * soon as possible to preserve agent responsiveness. To split a
-	 * long and slow task into smaller section, recursive behaviour
-	 * aggregation may be used.
-	 *
-	 * @see jade.core.behaviours.CompositeBehaviour
-	 */
-	public abstract void action();
+     * Runs the behaviour. This abstract method must be implemented by
+     * <code>Behaviour</code>subclasses to perform ordinary behaviour
+     * duty. An agent schedules its behaviours calling their
+     * <code>action()</code> method; since all the behaviours belonging
+     * to the same agent are scheduled cooperatively, this method
+     * <b>must not</b> enter in an endless loop and should return as
+     * soon as possible to preserve agent responsiveness. To split a
+     * long and slow task into smaller section, recursive behaviour
+     * aggregation may be used.
+     *
+     * @return
+     * @see jade.core.behaviours.CompositeBehaviour
+     */
+	public abstract int action();
 	
 	/**
 	 Check if this behaviour is done. The agent scheduler calls this

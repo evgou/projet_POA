@@ -71,8 +71,10 @@ public final class SenderBehaviour extends OneShotBehaviour {
    * message, using either the given <code>AgentGroup</code> or the
    * <code>:receiver</code> message slot to get the message recipient
    * names.
+   *
+   * @return
    */
-  public void action() {
+  public int action() {
     myAgent.send(message);
       return 0;
   }

@@ -90,7 +90,7 @@ public class TwoPhResponder extends Responder {
 		b = new OneShotBehaviour(myAgent) {
 	  	private static final long     serialVersionUID = 4487495895818001L;
 	  	
-			public void action() {
+			public int action() {
 			    ACLMessage reply = handleCfp((ACLMessage) getDataStore().get(RECEIVED_KEY));
 			    getDataStore().put(REPLY_KEY, reply);
                 return 0;
@@ -103,7 +103,7 @@ public class TwoPhResponder extends Responder {
 		b = new OneShotBehaviour(myAgent) {
 	  	private static final long     serialVersionUID = 4487495895818002L;
 	  	
-			public void action() {
+			public int action() {
 			    ACLMessage reply = handleQueryIf((ACLMessage) getDataStore().get(RECEIVED_KEY));
 			    getDataStore().put(REPLY_KEY, reply);
                 return 0;
@@ -116,7 +116,7 @@ public class TwoPhResponder extends Responder {
 		b = new OneShotBehaviour(myAgent) {
 	  	private static final long     serialVersionUID = 4487495895818003L;
 	  	
-			public void action() {
+			public int action() {
 			    ACLMessage reply = handleAcceptProposal((ACLMessage) getDataStore().get(RECEIVED_KEY));
 			    getDataStore().put(REPLY_KEY, reply);
                 return 0;
@@ -129,7 +129,7 @@ public class TwoPhResponder extends Responder {
 		b = new OneShotBehaviour(myAgent) {
 	  	private static final long     serialVersionUID = 4487495895818004L;
 	  	
-			public void action() {
+			public int action() {
 			    ACLMessage reply = handleRejectProposal((ACLMessage) getDataStore().get(RECEIVED_KEY));
 			    getDataStore().put(REPLY_KEY, reply);
                 return 0;

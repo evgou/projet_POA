@@ -231,7 +231,7 @@ public class ProposeInitiator extends FSMBehaviour {
     // PREPARE_INITIATIONS
     b = new OneShotBehaviour(myAgent) {
         private static final long serialVersionUID = 3487495895818000L;
-        public void action() {
+        public int action() {
           DataStore ds = getDataStore();
           Vector allInitiations = prepareInitiations((ACLMessage) ds.get(INITIATION_K));
           getDataStore().put(ALL_INITIATIONS_K, allInitiations);
@@ -244,7 +244,7 @@ public class ProposeInitiator extends FSMBehaviour {
     // SEND_INITIATIONS
     b = new OneShotBehaviour(myAgent) {
         private static final long serialVersionUID = 3487495895818001L;
-        public void action() {
+        public int action() {
           Vector allInitiations = (Vector) getDataStore().get(ALL_INITIATIONS_K);
           if (allInitiations != null) {
             sendInitiations(allInitiations);
@@ -267,7 +267,7 @@ public class ProposeInitiator extends FSMBehaviour {
         int ret;
         private static final long     serialVersionUID = 3487495895818002L;
   			
-        public void action() {
+        public int action() {
           ACLMessage reply = (ACLMessage) getDataStore().get(REPLY_KEY);
           if (checkInSequence(reply)) {
             ret = reply.getPerformative();
@@ -286,7 +286,7 @@ public class ProposeInitiator extends FSMBehaviour {
 
     // HANDLE_ALL_RESPONSES
     b = new OneShotBehaviour(myAgent) {
-        public void action() {
+        public int action() {
           handleAllResponses((Vector) getDataStore().get(ALL_RESPONSES_KEY));
             return 0;
         }
@@ -296,7 +296,7 @@ public class ProposeInitiator extends FSMBehaviour {
 	
     // HANDLE_ACCEPT_PROPOSAL
     b = new OneShotBehaviour(myAgent) {
-        public void action() {
+        public int action() {
           handleAcceptProposal((ACLMessage) getDataStore().get(REPLY_KEY));
             return 0;
         }
@@ -306,7 +306,7 @@ public class ProposeInitiator extends FSMBehaviour {
 		
     // HANDLE_REJECT_PROPOSAL
     b = new OneShotBehaviour(myAgent) {
-        public void action() {
+        public int action() {
           handleRejectProposal((ACLMessage) getDataStore().get(REPLY_KEY));
             return 0;
         }
@@ -318,7 +318,7 @@ public class ProposeInitiator extends FSMBehaviour {
     b = new OneShotBehaviour(myAgent) {
         private static final long     serialVersionUID = 3487495895818005L;
   	
-        public void action() {
+        public int action() {
           handleNotUnderstood((ACLMessage) getDataStore().get(REPLY_KEY));
             return 0;
         }
@@ -330,7 +330,7 @@ public class ProposeInitiator extends FSMBehaviour {
     b = new OneShotBehaviour(myAgent) {
         private static final long     serialVersionUID = 3487495895818008L;
   	
-        public void action() {
+        public int action() {
           handleOutOfSequence((ACLMessage) getDataStore().get(REPLY_KEY));
             return 0;
         }
@@ -343,7 +343,7 @@ public class ProposeInitiator extends FSMBehaviour {
         int ret;
         private static final long     serialVersionUID = 3487495895818009L;
   	
-        public void action() {
+        public int action() {
           ACLMessage reply = (ACLMessage) getDataStore().get(REPLY_KEY);
           ret = checkSessions(reply);
             return 0;
@@ -358,7 +358,7 @@ public class ProposeInitiator extends FSMBehaviour {
     // CHECK_AGAIN
     
     b = new OneShotBehaviour(myAgent) {
-        public void action() {
+        public int action() {
             return 0;
         }
         public int onEnd() {
@@ -372,7 +372,7 @@ public class ProposeInitiator extends FSMBehaviour {
     b = new OneShotBehaviour(myAgent) {
         private static final long     serialVersionUID = 3487495895818010L;
   	
-        public void action() {
+        public int action() {
             return 0;
         }
       };

@@ -292,7 +292,7 @@ public class SSContractNetResponder extends SSResponder {
 			super(a);
 		}
 		
-		public void action() {
+		public int action() {
 			SSContractNetResponder parent = (SSContractNetResponder) getParent();
 			ACLMessage reply = null;
 			try {
@@ -317,7 +317,7 @@ public class SSContractNetResponder extends SSResponder {
 			super(a);
 		}
 		
-		public void action() {
+		public int action() {
 			SSContractNetResponder parent = (SSContractNetResponder) getParent();
 			ACLMessage reply = null;
 			try {
@@ -345,7 +345,7 @@ public class SSContractNetResponder extends SSResponder {
 			super(a);
 		}
 		
-		public void action() {
+		public int action() {
 			SSContractNetResponder parent = (SSContractNetResponder) getParent();
 			ACLMessage cfp = (ACLMessage) getDataStore().get(parent.CFP_KEY);
 			ACLMessage propose = (ACLMessage) getDataStore().get(parent.PROPOSE_KEY);

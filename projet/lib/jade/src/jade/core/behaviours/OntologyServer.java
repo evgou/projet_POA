@@ -239,7 +239,7 @@ public class OntologyServer extends CyclicBehaviour {
 		}
 	}
 
-	public final void action() {
+	public final int action() {
 		boolean messageReceived = false;
 		if (maxProcessedMessagesPerRun == 1) {
 			// Process a single message

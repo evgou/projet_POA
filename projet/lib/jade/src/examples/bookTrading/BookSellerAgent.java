@@ -90,7 +90,7 @@ public class BookSellerAgent extends Agent {
 	 */
 	public void updateCatalogue(final String title, final int price) {
 		addBehaviour(new OneShotBehaviour() {
-			public void action() {
+			public int action() {
 				catalogue.put(title, new Integer(price));
 				System.out.println(title+" inserted into catalogue. Price = "+price);
                 return 0;
@@ -107,7 +107,7 @@ public class BookSellerAgent extends Agent {
 	   sent back.
 	 */
 	private class OfferRequestsServer extends CyclicBehaviour {
-		public void action() {
+		public int action() {
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
 			ACLMessage msg = myAgent.receive(mt);
 			if (msg != null) {
@@ -144,7 +144,7 @@ public class BookSellerAgent extends Agent {
 	   purchase has been sucesfully completed.
 	 */
 	private class PurchaseOrdersServer extends CyclicBehaviour {
-		public void action() {
+		public int action() {
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
 			ACLMessage msg = myAgent.receive(mt);
 			if (msg != null) {

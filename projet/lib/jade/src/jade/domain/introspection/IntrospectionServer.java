@@ -61,7 +61,7 @@ public class IntrospectionServer extends CyclicBehaviour {
 				MessageTemplate.MatchPerformative(jade.lang.acl.ACLMessage.REQUEST) );
 	}
 	
-	public void action() {
+	public int action() {
 		jade.lang.acl.ACLMessage request = myAgent.receive(template);
 		if (request != null) {
 			try {

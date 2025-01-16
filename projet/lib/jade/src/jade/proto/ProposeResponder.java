@@ -103,7 +103,7 @@ public class ProposeResponder extends FSMBehaviour implements FIPANames.Interact
 	private PrepareResponse() {
 	}
 
-        public void action() {
+        public int action() {
 	    ProposeResponder fsm = (ProposeResponder)getParent();
 	    DataStore ds = getDataStore();
 	    ACLMessage propose = (ACLMessage) ds.get(fsm.PROPOSE_KEY);

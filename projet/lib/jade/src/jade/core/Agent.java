@@ -726,7 +726,7 @@ public class Agent implements Runnable, Serializable
 	 @return A <code>String</code> containing the complete agent name
 	 (e.g. <em>peter@fipa.org:50</em>).
 	 */
-	public final String getName() { 
+	public static final String getName() {
 		if (myHap != null) {
 			return myName + '@' + myHap;
 		}

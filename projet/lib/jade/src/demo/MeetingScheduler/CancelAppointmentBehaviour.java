@@ -48,7 +48,7 @@ public class CancelAppointmentBehaviour extends CyclicBehaviour {
     myAgent = a;
   }
 
-  public void action(){
+  public int action(){
     cancel = myAgent.receive(mt);
     if (cancel == null) {
       block();

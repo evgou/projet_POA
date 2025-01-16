@@ -86,7 +86,7 @@ public abstract class GuiAgent extends Agent
 			super(GuiAgent.this);
 		}
 
-		public void action()
+		public int action()
 		{
 			if (!guiEventQueue.isEmpty())
 			{

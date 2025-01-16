@@ -242,7 +242,7 @@ abstract class SSResponder extends FSMBehaviour {
 			super(a);
 		}
 		
-		public void action() {
+		public int action() {
 			SSResponder parent = (SSResponder) getParent();
 			ACLMessage received = (ACLMessage)getDataStore().get(parent.RECEIVED_KEY);
 			if (received != null && parent.checkInSequence(received)) {
@@ -270,7 +270,7 @@ abstract class SSResponder extends FSMBehaviour {
 			super(a);
 		}
 		
-		public void action() {
+		public int action() {
 			SSResponder parent = (SSResponder) getParent();
 			parent.handleOutOfSequence((ACLMessage)getDataStore().get(parent.RECEIVED_KEY));
             return 0;
@@ -336,7 +336,7 @@ abstract class SSResponder extends FSMBehaviour {
 			super(a);
 		}
 		
-		public void action() {
+		public int action() {
 			SSResponder parent = (SSResponder) getParent();
 			parent.sessionTerminated();
             return 0;

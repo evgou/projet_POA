@@ -8,6 +8,8 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
+import jade.gui.GuiAgent;
+import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -16,27 +18,39 @@ import java.util.logging.Logger;
 /**
  * On appelle cet agent (vendeur) avec en argument son nom et le nom du poisson de l'enchère
  */
-public class Vendeur extends Agent {
+public class Vendeur extends GuiAgent {
     private static final Logger logger = Logger.getLogger(Vendeur.class.getName());
+    private VendeurGUI gui;
+
+    AID market = new AID("market", AID.ISLOCALNAME);
     private AID preneur = null;
+
+
     // Valeur du prix et du pas par défaut pour le moment
-    // TODO : modifier
+    // TODO : modifier et le mettre dans l'interface
     private int price = 1000;
     private int pas = 50;
+
 
     /**
      * setup : créé l'automate FSM
      */
+    @Override
     protected void setup() {
         logger.info("Agent Vendeur " + this.getName() + " is ready.");
 
         Object[] args = getArguments();
         // Vérifie s'il y a les arguments nécessaires
         if (args != null && args.length > 1) {
+
+            gui = new VendeurGUI(this);
+            gui.showGui();
+
             // FSM Behaviour
             FSMBehaviour fsm = new FSMBehaviour(this) {
                 public int onEnd() {
                     logger.info(getAID().getName() + "-------------------------> Behaviour completed.");
+                    logger.info("Fin de l'enchère.");
                     logger.info("Agent Vendeur " + getAID().getName() + " terminating.");
                     return super.onEnd();
                 }
@@ -66,10 +80,6 @@ public class Vendeur extends Agent {
             addBehaviour(fsm);
 
 
-            // TODO myGui =
-
-
-
             // Description du service
             String poisson = args[1].toString();
             ServiceDescription sd = new ServiceDescription();
@@ -87,7 +97,7 @@ public class Vendeur extends Agent {
             dfd.setName(getAID());
             dfd.addServices(sd);
             try {
-                DFService.register(this, new AID("market", AID.ISLOCALNAME), dfd);
+                DFService.register(this, market, dfd);
             }
             catch (FIPAException fe) {
                 fe.printStackTrace();
@@ -105,19 +115,26 @@ public class Vendeur extends Agent {
         }
     }
 
+    @Override
+    protected void onGuiEvent(GuiEvent ev) {
+        logger.info("Commande reçue depuis l'IHM : " + ev.getAllParameter());
+    }
+
+
     // Définiton de tous les états possibles de l'automate
 
     /**
      * SendPrice envoie le prix de base au marché
      */
     private class SendPrice extends OneShotBehaviour {
-        public void action() {
+        public int action() {
             // TODO : envoie de l'enchère au marché avec un message CFP qui contient le prix
             logger.info("Arrivé dans la classe SendPrice.");
             ACLMessage msg = new ACLMessage(ACLMessage.CFP);
             msg.setContent(String.valueOf(price));
-            msg.addReceiver(new AID("market", AID.ISLOCALNAME));
+            msg.addReceiver(market);
             send(msg);
+            return 0;
         }
     }
 
@@ -153,8 +170,8 @@ public class Vendeur extends Agent {
      *   - si aucun autre message n'est reçu, c'est le seul preneur qui a fait une offre qui gagne l'enchère,
      *   on va donc vers l'état SendInform pour l'en informer
      */
-    private class ReceivedPropose extends OneShotBehaviour {
-        public void action() {
+    private static class ReceivedPropose extends OneShotBehaviour {
+        public int action() {
             logger.info("Arrivé dans la classe ReceivedPropose.");
             // Vérification si un deuxième message est arrivé
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.PROPOSE);
@@ -174,7 +191,7 @@ public class Vendeur extends Agent {
      *
      */
     private class HandleRefuse extends OneShotBehaviour {
-        public void action() {
+        public int action() {
             logger.info("Arrivé dans la classe HandleRefuse.");
             // Augmentation du prix car plusieurs preneurs
             price = price + pas;
@@ -183,6 +200,7 @@ public class Vendeur extends Agent {
             for (int i = 0; i < agentsPreneur.lenght; i++) {
                 cfp.addReceiver(agentsPreneur[i]);
             }
+            cfp.addReceiver(market);
             cfp.setContent(String.valueOf(price));
             myAgent.send(cfp);
 
@@ -197,7 +215,7 @@ public class Vendeur extends Agent {
      * et envoie un message INFORM à cet agent preneur (pour REP_BID_OK)
      */
     private class SendInform extends OneShotBehaviour {
-        public void action() {
+        public int action() {
             logger.info("Arrivé dans la classe SendInform.");
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.PROPOSE);
             ACLMessage msg = myAgent.receive(mt);
@@ -209,6 +227,7 @@ public class Vendeur extends Agent {
             else {
                 block();
             }
+            return 0;
         }
     }
 
@@ -216,11 +235,13 @@ public class Vendeur extends Agent {
      * <b>SendAcceptProposal</b> envoie un message ACCCEPT_PROPOSAL au preneur choisi
      */
     private class SendAcceptProposal extends OneShotBehaviour {
-        public void action() {
+        public int action() {
             logger.info("Arrivé dans la classe SendAcceptProposal.");
             ACLMessage msg = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
+            // TODO : modifier new AID
             msg.addReceiver(new AID("preneur", AID.ISLOCALNAME));
             send(msg);
+            return 0;
         }
     }
 
@@ -228,13 +249,14 @@ public class Vendeur extends Agent {
      * <b>ReceivedConfirm</b> vérifie que le preneur confirme bien le message ACCEPT_PROPOSAL que le vendeur lui a envoyé
      */
     private class ReceivedConfirm extends OneShotBehaviour {
-        public void action() {
+        public int action() {
             logger.info("Arrivé dans la classe ReceivedConfirm.");
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CONFIRM);
             ACLMessage msg = myAgent.receive(mt);
             if (msg == null) {
                 block();
             }
+            return 0;
         }
     }
 
@@ -242,7 +264,7 @@ public class Vendeur extends Agent {
      * <b>SendAgree</b> envoie un message AGREE au marché avec comme contenu le poisson et supprime l'agent
      */
     private class SendAgree extends OneShotBehaviour {
-        public void action() {
+        public int action() {
             logger.info("Arrivé dans la classe SendAgree.");
             // Envoie le message AGREE (TO_GIVE) au marché pour l'informer de la fin de l'enchère
             ACLMessage msg = new ACLMessage(ACLMessage.AGREE);
@@ -251,6 +273,7 @@ public class Vendeur extends Agent {
             msg.addReceiver(new AID("market", AID.ISLOCALNAME));
             send(msg);
             doDelete();
+            return 0;
         }
     }
 
@@ -265,8 +288,7 @@ public class Vendeur extends Agent {
         }
 
         // Ferme le GUI
-        // TODO : création du "myGui" ?
-        myGui.dispose();
+        gui.dispose();
 
         logger.info("Agent Vendeur " + this.getName() + " done.");
     }

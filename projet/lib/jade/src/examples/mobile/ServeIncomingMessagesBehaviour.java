@@ -56,7 +56,7 @@ class ServeIncomingMessagesBehaviour extends SimpleBehaviour
 		return false;
 	}
 
-	public void action()
+	public int action()
 	{
 		ACLMessage msg;
 		MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);

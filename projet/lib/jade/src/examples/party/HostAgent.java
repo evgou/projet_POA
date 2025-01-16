@@ -152,7 +152,7 @@ public class HostAgent
 
             // add a Behaviour to handle messages from guests
             addBehaviour( new CyclicBehaviour( this ) {
-                            public void action() {
+                            public int action() {
                                 ACLMessage msg = receive();
 
                                 if (msg != null) {

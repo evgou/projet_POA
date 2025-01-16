@@ -382,7 +382,7 @@ public class ToolNotifier extends ToolAgent implements MessageListener, AgentLis
 		else {
 			// If we are not active yet we can't use the ContentManager --> Do the operation in a behaviour
 			addBehaviour(new OneShotBehaviour(this) {
-				public void action() {
+				public int action() {
 					informStartNotify(id);
                     return 0;
                 }
@@ -441,7 +441,7 @@ public class ToolNotifier extends ToolAgent implements MessageListener, AgentLis
 			template = MessageTemplate.MatchInReplyTo(replyWith);
 		}
 		
-		public void action() {
+		public int action() {
 			ACLMessage msg = myAgent.receive(template);
 			if (msg != null) {
 				jev.notifyProcessed(null);

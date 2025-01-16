@@ -45,7 +45,7 @@ class DummyBehaviour extends CyclicBehaviour {
 		super(a);
 	}
 
-	public void action() {
+	public int action() {
 		ACLMessage msg = myAgent.receive();
 		if (msg != null) {		
 			// ATTENTION!! In order to insert the received message in the queued message list 

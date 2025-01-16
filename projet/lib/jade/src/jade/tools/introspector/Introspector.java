@@ -548,7 +548,7 @@ public class Introspector extends ToolAgent {
 			
 		}
 		
-		public void action() {
+		public int action() {
 			
 			ACLMessage message = receive(template);
 			if(message != null) {
@@ -600,7 +600,7 @@ public class Introspector extends ToolAgent {
 					MessageTemplate.MatchConversationId(getName() + "-control"));
 		}
 		
-		public void action() {
+		public int action() {
 			ACLMessage message = receive(template);
 			if(message != null) {
 				try{

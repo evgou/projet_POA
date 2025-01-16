@@ -77,7 +77,7 @@ public class JadeJessBehaviour extends CyclicBehaviour // tells JESS about incom
       jessException.printStackTrace(System.err);
       }
     } // end run method
-  public void action() // executes agent behaviour in reaction to messages
+  public int action() // executes agent behaviour in reaction to messages
     {
     ACLMessage message=receive(); // get a message from another agent
     if (message != null) // only do something if anything arrived

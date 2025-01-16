@@ -155,7 +155,7 @@ public class SubscriptionResponder extends FSMBehaviour implements FIPANames.Int
 		// HANDLE_SUBSCRIPTION
 		b = new OneShotBehaviour(myAgent) {
 			
-			public void action() {
+			public int action() {
 				DataStore ds = getDataStore();
 				ACLMessage subscription = (ACLMessage) ds.get(SUBSCRIPTION_KEY);
 				ACLMessage response = null;
@@ -177,7 +177,7 @@ public class SubscriptionResponder extends FSMBehaviour implements FIPANames.Int
 		
 		// HANDLE_CANCEL 
 		b = new OneShotBehaviour(myAgent) {
-			public void action() {
+			public int action() {
 				DataStore ds = getDataStore();
 				ACLMessage cancel = (ACLMessage) ds.get(CANCEL_KEY);
 				ACLMessage response = null;
@@ -201,7 +201,7 @@ public class SubscriptionResponder extends FSMBehaviour implements FIPANames.Int
 		
 		// SEND_NOTIFICATIONS 
 		b = new OneShotBehaviour(myAgent) {
-			public void action() {
+			public int action() {
 				sendNotifications();
                 return 0;
             }

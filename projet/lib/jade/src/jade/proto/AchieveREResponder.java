@@ -104,7 +104,7 @@ public class AchieveREResponder extends FSMBehaviour implements FIPANames.Intera
 			super(a);
 		}
 		
-		public void action() {
+		public int action() {
 			DataStore ds = getDataStore();
 			AchieveREResponder fsm = (AchieveREResponder)getParent();
 			ACLMessage request = (ACLMessage) ds.get(fsm.REQUEST_KEY);
@@ -157,7 +157,7 @@ public class AchieveREResponder extends FSMBehaviour implements FIPANames.Intera
 		private PrepareResult() {
 		}
 		
-		public void action() {
+		public int action() {
 			DataStore ds = getDataStore();
 			AchieveREResponder fsm = (AchieveREResponder)getParent();
 			ACLMessage request = (ACLMessage) ds.get(fsm.REQUEST_KEY);

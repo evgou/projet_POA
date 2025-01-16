@@ -46,8 +46,10 @@ public class ReceiveCyclicBehaviour extends CyclicBehaviour {
 
   /**
    * Description of the Method
+   *
+   * @return
    */
-  public void action() {
+  public int action() {
     agent.processIncomingMessage(agent.blockingReceive());
       return 0;
   }

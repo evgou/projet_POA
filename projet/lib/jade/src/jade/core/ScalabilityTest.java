@@ -417,7 +417,7 @@ public class ScalabilityTest {
 			}
 			else {
 				addBehaviour(new CyclicBehaviour(this) {
-					public void action() {
+					public int action() {
 						job();
                         return 0;
                     }
@@ -451,7 +451,7 @@ public class ScalabilityTest {
 
 		protected void setup() {
 			addBehaviour(new CyclicBehaviour(this) {
-				public void action() {
+				public int action() {
 					ACLMessage msg = myAgent.receive();
 					if (msg != null) {
 						cnt++;
@@ -526,7 +526,7 @@ public class ScalabilityTest {
 			}
 			else {
 				addBehaviour(new CyclicBehaviour(this) {
-					public void action() {
+					public int action() {
 						job();
                         return 0;
                     }
@@ -563,7 +563,7 @@ public class ScalabilityTest {
 		private int cnt = 0;
 		protected void setup() {
 			addBehaviour(new CyclicBehaviour(this) {
-				public void action() {
+				public int action() {
 					ACLMessage msg = myAgent.receive();
 					if (msg != null) {
 						ACLMessage reply = msg.createReply();
