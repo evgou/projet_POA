@@ -15,8 +15,8 @@ import java.util.logging.Logger;
 
 
 public class Marche extends jade.domain.df {
-    private static final Logger logger = Logger.getLogger(Vendeur.class.getName());
-    private MarcheGUI gui;
+    private static final Logger logger = Logger.getLogger(Marche.class.getName());
+    private MarcheAgentGUI gui;
 
     private List<String> vendeurs;
     private List<String> preneurs;
@@ -30,7 +30,7 @@ public class Marche extends jade.domain.df {
         vendeurs = new ArrayList<>();
         preneurs = new ArrayList<>();
         offres = new ArrayList<>();
-        gui = new MarcheGUI(this);
+        gui = new MarcheAgentGUI(this);
         gui.showGui();
 
         try {

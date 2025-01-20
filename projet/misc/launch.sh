@@ -15,4 +15,4 @@ export CLASSPATH=.:../lib/jade/lib/jade.jar:../lib/jade/lib/commons-codec/common
 
 # Compile et exécute l'agent Marché + Vendeur
 javac -d ../classes ../vendeur/* ../marche/*
-java jade.Boot -gui -agents "Vincent:marche.Marche(Vincent);Manu:vendeur.Vendeur(Manu)"
+java jade.Boot -gui -agents "Manu:marche.MarcheAgent(Manu);Victor:vendeur.VendeurAgent(Victor);Vincent:vendeur.VendeurAgent(Vincent)"

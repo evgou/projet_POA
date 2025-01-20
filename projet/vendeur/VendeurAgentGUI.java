@@ -12,14 +12,14 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 
-public class PreneurAgentGUI extends JFrame {
+public class VendeurAgentGUI extends JFrame {
     private final Vendeur agent;
     private JTextArea logArea;
     private JTextField commandField;
     private static final Logger logger = Logger.getLogger(PreneurAgentGUI.class.getName());
 
 
-    public PreneurAgentGUI(Vendeur agent) {
+    public VendeurAgentGUI(Vendeur agent) {
         this.agent = agent;
 
         //ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/javax/swing/plaf/metal/icons/Folder.gif")));
