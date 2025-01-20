@@ -13,24 +13,21 @@ import java.util.logging.Logger;
 
 
 public class VendeurAgentGUI extends JFrame {
-    private final Vendeur agent;
+    private final VendeurAgent agent;
     private JTextArea logArea;
     private JTextField commandField;
-    private static final Logger logger = Logger.getLogger(PreneurAgentGUI.class.getName());
+    private static final Logger logger = Logger.getLogger(VendeurAgentGUI.class.getName());
 
 
-    public VendeurAgentGUI(Vendeur agent) {
+    public VendeurAgentGUI(VendeurAgent agent) {
         this.agent = agent;
-
-        //ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/javax/swing/plaf/metal/icons/Folder.gif")));
-        //setIconImage(icon.getImage());
 
         setTitle(agent.getLocalName());
         setSize(1000, 300);
         //setIconImage(Toolkit.getDefaultToolkit().getImage("/home/alicia/Documents/M2/POA/projet_POA/projet/misc/images/poisson.png"));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        logger.info("Je suis là");
+        //logger.info("Je suis là");
 
 
         logArea = new JTextArea();

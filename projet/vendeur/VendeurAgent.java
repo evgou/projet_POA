@@ -1,17 +1,11 @@
 package vendeur;
 
-import jade.core.Agent;
-import jade.core.behaviours.*;
 import jade.core.AID;
 import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
-import jade.domain.FIPANames;
 import jade.gui.GuiAgent;
 import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +14,11 @@ import java.util.logging.Logger;
 /**
  * On appelle cet agent (vendeur) avec en argument son nom et le nom du poisson de l'enchère
  */
-public class Vendeur extends GuiAgent {
-    private static final Logger logger = Logger.getLogger(Vendeur.class.getName());
-    private VendeurGUI gui;
+public class VendeurAgent extends GuiAgent {
+    private static final Logger logger = Logger.getLogger(VendeurAgent.class.getName());
+    private VendeurAgentGUI gui;
 
-    AID market = new AID("market", AID.ISLOCALNAME);
+    AID market = new AID("Manu", AID.ISLOCALNAME);
     private AID preneur = null;
     private List<AID> agentsPreneur;
 
@@ -51,9 +45,9 @@ public class Vendeur extends GuiAgent {
 
         Object[] args = getArguments();
         // Vérifie s'il y a les arguments nécessaires
-        if (args != null && args.length > 1) {
+        if (args != null && args.length > 0) {
 
-            gui = new VendeurGUI(this);
+            gui = new VendeurAgentGUI(this);
             gui.showGui();
             agentsPreneur = new ArrayList<>();
 

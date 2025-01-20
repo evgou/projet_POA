@@ -12,18 +12,15 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 
-public class PreneurAgentGUI extends JFrame {
-    private final Marche agent;
+public class MarcheAgentGUI extends JFrame {
+    private final MarcheAgent agent;
     private JTextArea logArea;
     private JTextField commandField;
-    private static final Logger logger = Logger.getLogger(PreneurAgentGUI.class.getName());
+    private static final Logger logger = Logger.getLogger(MarcheAgentGUI.class.getName());
 
 
-    public PreneurAgentGUI(Marche agent) {
+    public MarcheAgentGUI(MarcheAgent agent) {
         this.agent = agent;
-
-        ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/javax/swing/plaf/metal/icons/Folder.gif")));
-        setIconImage(icon.getImage());
 
         setTitle(agent.getLocalName());
         setSize(1000, 300);

@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 
-public class Marche extends jade.domain.df {
-    private static final Logger logger = Logger.getLogger(Marche.class.getName());
+public class MarcheAgent extends jade.domain.df {
+    private static final Logger logger = Logger.getLogger(MarcheAgent.class.getName());
     private MarcheAgentGUI gui;
 
     private List<String> vendeurs;
@@ -32,30 +32,6 @@ public class Marche extends jade.domain.df {
         offres = new ArrayList<>();
         gui = new MarcheAgentGUI(this);
         gui.showGui();
-
-        try {
-            AID parentName = getDefaultDF();
-
-            // Execute the setup of jade.domain.df which includes all the default behaviours of a df
-            // (i.e. register, unregister, modify and search)
-            super.setup();
-
-            // Use this method to modify the current description of this df
-            setDescriptionOfThisDF(getDescription());
-
-            // Register and federate this df with de default df
-            // to be registered as a child df, agent's description must declare a "fipa-df" service
-            DFService.register(this, parentName, getDescription());
-            //register the parent df
-            addParent(parentName, getDescription());
-
-            // Show the default gui of this DF
-            showGui();
-        }
-
-        catch (Exception e) {
-            e.printStackTrace();
-        }
 
         addBehaviour(new RegisterAgents(this, 2000));
 
@@ -76,18 +52,23 @@ public class Marche extends jade.domain.df {
         }
 
         protected void onWake() {
+            logger.info("On se réveille");
             ACLMessage msg = myAgent.receive();
             while (msg != null) {
+                System.out.println("On a reçu un message : " + msg.getContent());
                 if (msg.getPerformative() == ACLMessage.INFORM) {
-                    if (msg.getContent() == "0") {
+                    logger.info("On est dans le second if");
+                    if (msg.getContent().contentEquals("0")) {
                         vendeurs.add(msg.getSender().getLocalName());
                         logger.info("Liste des vendeurs : " + vendeurs);
                     }
-                    if (msg.getContent() == "1") {
+                    if (msg.getContent().contentEquals("1")) {
                         preneurs.add(msg.getSender().getLocalName());
                         logger.info("Liste des preneurs : " + preneurs);
                     }
                 }
+                msg = null;
+                msg = myAgent.receive();
             }
         }
     }
