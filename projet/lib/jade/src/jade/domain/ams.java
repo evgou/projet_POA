@@ -198,7 +198,7 @@ public class ams extends Agent /*implements AgentManager.Listener*/ {
 		// Temporary patch: 
 		SequentialBehaviour sb = new SequentialBehaviour();
 		sb.addSubBehaviour(new WakerBehaviour(this, 1000) {
-			public int onWake() {
+			public void onWake() {
 				// Just do nothing
                 return 0;
             }

@@ -6,7 +6,6 @@ import jade.core.AID;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames;
-import jade.gui.GuiAgent;
 import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
 import vendeur.Vendeur;
@@ -57,13 +56,39 @@ public class Marche extends jade.domain.df {
             e.printStackTrace();
         }
 
+        addBehaviour(new RegisterAgents(this, 2000));
+
         // TODO : continuer le code
 
+        // TODO : faire le register
         // TODO : faire un "deregister" (ou "unregister" plutot ?) quand une enchère est finie : Permet aux agents de se désinscrire
         // TODO : modify : Permet de modifier un enregistrement existant
         // TODO : search : Permet de rechercher des services ou des agents
 
 
+    }
+
+    private class RegisterAgents extends WakerBehaviour {
+
+        public RegisterAgents(Agent a, long timeout) {
+            super(a, timeout);
+        }
+
+        protected void onWake() {
+            ACLMessage msg = myAgent.receive();
+            while (msg != null) {
+                if (msg.getPerformative() == ACLMessage.INFORM) {
+                    if (msg.getContent() == "0") {
+                        vendeurs.add(msg.getSender().getLocalName());
+                        logger.info("Liste des vendeurs : " + vendeurs);
+                    }
+                    if (msg.getContent() == "1") {
+                        preneurs.add(msg.getSender().getLocalName());
+                        logger.info("Liste des preneurs : " + preneurs);
+                    }
+                }
+            }
+        }
     }
 
 

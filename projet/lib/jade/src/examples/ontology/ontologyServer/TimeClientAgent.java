@@ -29,7 +29,7 @@ public class TimeClientAgent extends Agent {
 		
 		// After 10 seconds request the current time
 		addBehaviour(new WakerBehaviour(this, 10000) {
-			public int onWake() {
+			public void onWake() {
 				requestGetTime();
                 return 0;
             }
@@ -37,7 +37,7 @@ public class TimeClientAgent extends Agent {
 		
 		// After 20 seconds shift the time managed by the TimeServerAgent by 1 hour
 		addBehaviour(new WakerBehaviour(this, 20000) {
-			public int onWake() {
+			public void onWake() {
 				Date newTime = new Date(System.currentTimeMillis() + 3600000); // Now + 1 hour 
 				requestSetTime(newTime);
                 return 0;
@@ -46,7 +46,7 @@ public class TimeClientAgent extends Agent {
 		
 		// After 30 seconds request the current time again
 		addBehaviour(new WakerBehaviour(this, 30000) {
-			public int onWake() {
+			public void onWake() {
 				requestGetTime();
                 return 0;
             }

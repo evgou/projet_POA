@@ -139,10 +139,8 @@ public abstract class WakerBehaviour extends SimpleBehaviour {
      * constructor expires).
      * Subclasses are expected to define this method specifying the action
      * that must be performed at that time.
-     *
-     * @return
      */
-	protected int onWake() {
+	protected void onWake() {
 		handleElapsedTimeout();
         return 0;
     }

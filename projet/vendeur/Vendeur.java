@@ -42,6 +42,13 @@ public class Vendeur extends GuiAgent {
     protected void setup() {
         logger.info("Agent Vendeur " + getName() + " is ready.");
 
+        // TODO : envoie d'un message au marché pour se faire connaitre
+        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        msg.addReceiver(market);
+        msg.setContent("0");
+        send(msg);
+
+
         Object[] args = getArguments();
         // Vérifie s'il y a les arguments nécessaires
         if (args != null && args.length > 1) {
@@ -152,13 +159,15 @@ public class Vendeur extends GuiAgent {
      *     <li> sinon, on baisse le prix en fonction du pas et on renvoit le nouveau prix </li>
      * </ul>
      */
+
+    //TODO : faire plutot un onTick
     private class WaitForMsg extends WakerBehaviour {
         public WaitForMsg(Agent a, long timeout) {
             super(a, timeout);
         }
 
         @Override
-        protected int onWake() {
+        protected void onWake() {
             logger.info("Arrivé dans la classe WaitForMsg");
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.PROPOSE);
             ACLMessage msg = myAgent.receive(mt);
@@ -172,11 +181,11 @@ public class Vendeur extends GuiAgent {
                 } else {
                     logger.info(msg.getSender().getLocalName() + " est déjà dans la liste des agents preneurs.");
                 }
-                return 2;
+                //return 2;
             }
             else {
                 price = price - pas;
-                return 1;
+                //return 1;
             }
         }
     }
