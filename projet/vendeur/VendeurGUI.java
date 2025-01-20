@@ -1,4 +1,4 @@
-package marche;
+package vendeur;
 
 import jade.gui.GuiAgent;
 import jade.gui.GuiEvent;
@@ -13,17 +13,17 @@ import java.util.logging.Logger;
 
 
 public class PreneurAgentGUI extends JFrame {
-    private final Marche agent;
+    private final Vendeur agent;
     private JTextArea logArea;
     private JTextField commandField;
     private static final Logger logger = Logger.getLogger(PreneurAgentGUI.class.getName());
 
 
-    public PreneurAgentGUI(Marche agent) {
+    public PreneurAgentGUI(Vendeur agent) {
         this.agent = agent;
 
-        ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/javax/swing/plaf/metal/icons/Folder.gif")));
-        setIconImage(icon.getImage());
+        //ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/javax/swing/plaf/metal/icons/Folder.gif")));
+        //setIconImage(icon.getImage());
 
         setTitle(agent.getLocalName());
         setSize(1000, 300);
