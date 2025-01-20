@@ -14,8 +14,7 @@ public class VendeurGUI extends JFrame {
 
     private final Vendeur agent;
     private JTextField price;
-    private JTextField delay;
-    private JTextField step;
+    private JTextField pas;
     private JTextField name;
 
 
@@ -46,9 +45,8 @@ public class VendeurGUI extends JFrame {
     public void addComponentsToPane(final Container pane) {
         setTitle(Vendeur.getName());
 
-        price = new JTextField("500");
-        delay = new JTextField("10");
-        step = new JTextField("50");
+        price = new JTextField("1000");
+        pas = new JTextField("50");
         name = new JTextField("Poisson");
     }
 

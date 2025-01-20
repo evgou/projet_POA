@@ -13,6 +13,8 @@ import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -24,20 +26,21 @@ public class Vendeur extends GuiAgent {
 
     AID market = new AID("market", AID.ISLOCALNAME);
     private AID preneur = null;
+    private List<AID> agentsPreneur;
 
 
     // Valeur du prix et du pas par défaut pour le moment
     // TODO : modifier et le mettre dans l'interface
     private int price = 1000;
-    private int pas = 50;
+    private final int pas = 50;
 
 
     /**
-     * setup : créé l'automate FSM
+     * setup : création de l'automate FSM
      */
     @Override
     protected void setup() {
-        logger.info("Agent Vendeur " + this.getName() + " is ready.");
+        logger.info("Agent Vendeur " + getName() + " is ready.");
 
         Object[] args = getArguments();
         // Vérifie s'il y a les arguments nécessaires
@@ -45,6 +48,8 @@ public class Vendeur extends GuiAgent {
 
             gui = new VendeurGUI(this);
             gui.showGui();
+            agentsPreneur = new ArrayList<>();
+
 
             // FSM Behaviour
             FSMBehaviour fsm = new FSMBehaviour(this) {
@@ -115,6 +120,9 @@ public class Vendeur extends GuiAgent {
         }
     }
 
+    /**
+     * @param ev The GUI event to handle.
+     */
     @Override
     protected void onGuiEvent(GuiEvent ev) {
         logger.info("Commande reçue depuis l'IHM : " + ev.getAllParameter());
@@ -128,7 +136,6 @@ public class Vendeur extends GuiAgent {
      */
     private class SendPrice extends OneShotBehaviour {
         public int action() {
-            // TODO : envoie de l'enchère au marché avec un message CFP qui contient le prix
             logger.info("Arrivé dans la classe SendPrice.");
             ACLMessage msg = new ACLMessage(ACLMessage.CFP);
             msg.setContent(String.valueOf(price));
@@ -140,8 +147,10 @@ public class Vendeur extends GuiAgent {
 
     /**
      * <b>WaitForMsg</b> vérifie si après passé un délai de temps, il recoit des messages ou pas.
-     *   - si reception d'un message, on passe à l'état "Propose" qui gèrera le nombre de messages reçus
-     *   - sinon, on baisse le prix en fonction du pas et on renvoit le nouveau prix
+     * <ul>
+     *     <li> si reception d'un message, on passe à l'état "Propose" qui gèrera le nombre de messages reçus </li>
+     *     <li> sinon, on baisse le prix en fonction du pas et on renvoit le nouveau prix </li>
+     * </ul>
      */
     private class WaitForMsg extends WakerBehaviour {
         public WaitForMsg(Agent a, long timeout) {
@@ -155,6 +164,14 @@ public class Vendeur extends GuiAgent {
             ACLMessage msg = myAgent.receive(mt);
             if (msg != null) {
                 preneur = msg.getSender();
+
+                // Vérification que l'agent preneur n'est pas déjà dans la liste
+                if (!agentsPreneur.contains(msg.getSender())) {
+                    agentsPreneur.add(msg.getSender());
+                    logger.info("Ajout de " + msg.getSender().getLocalName() + " à la liste des agents preneurs.");
+                } else {
+                    logger.info(msg.getSender().getLocalName() + " est déjà dans la liste des agents preneurs.");
+                }
                 return 2;
             }
             else {
@@ -166,9 +183,11 @@ public class Vendeur extends GuiAgent {
 
     /**
      * <b>ReceivedPropose</b> recoit le premier message et est en attente d'autres messages
-     *   - si d'autres messages sont reçus, on passe à l'état "Refuse
-     *   - si aucun autre message n'est reçu, c'est le seul preneur qui a fait une offre qui gagne l'enchère,
-     *   on va donc vers l'état SendInform pour l'en informer
+     * <ul>
+     *     <li> si d'autres messages sont reçus, on passe à l'état "Refuse"</li>
+     *     <li> si aucun autre message n'est reçu, c'est le seul preneur qui a fait une offre qui gagne l'enchère,
+     *     on va donc vers l'état SendInform pour l'en informer </li>
+     * </ul>
      */
     private static class ReceivedPropose extends OneShotBehaviour {
         public int action() {
@@ -197,8 +216,8 @@ public class Vendeur extends GuiAgent {
             price = price + pas;
             ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
             // TODO : implémenter la liste agentsPreneur
-            for (int i = 0; i < agentsPreneur.lenght; i++) {
-                cfp.addReceiver(agentsPreneur[i]);
+            for (AID pren : agentsPreneur) {
+                cfp.addReceiver(pren);
             }
             cfp.addReceiver(market);
             cfp.setContent(String.valueOf(price));
@@ -248,7 +267,7 @@ public class Vendeur extends GuiAgent {
     /**
      * <b>ReceivedConfirm</b> vérifie que le preneur confirme bien le message ACCEPT_PROPOSAL que le vendeur lui a envoyé
      */
-    private class ReceivedConfirm extends OneShotBehaviour {
+    private static class ReceivedConfirm extends OneShotBehaviour {
         public int action() {
             logger.info("Arrivé dans la classe ReceivedConfirm.");
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CONFIRM);
@@ -290,7 +309,7 @@ public class Vendeur extends GuiAgent {
         // Ferme le GUI
         gui.dispose();
 
-        logger.info("Agent Vendeur " + this.getName() + " done.");
+        logger.info("Agent Vendeur " + getName() + " done.");
     }
 
 }

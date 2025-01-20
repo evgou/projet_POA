@@ -10,7 +10,6 @@ import jade.gui.GuiAgent;
 import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
 import vendeur.Vendeur;
-import vendeur.VendeurGUI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,44 +33,57 @@ public class Marche extends jade.domain.df {
         preneurs = new ArrayList<>();
         offres = new ArrayList<>();
 
-        Object[] args = getArguments();
-        // Vérifie s'il y a les arguments nécessaires
-        if (args != null && args.length > 1) {
+        try {
+            AID parentName = getDefaultDF();
 
-            gui = new MarcheGUI(this);
-            gui.show();
+            // Execute the setup of jade.domain.df which includes all the default behaviours of a df
+            // (i.e. register, unregister, modify and search)
+            super.setup();
+
+            // Use this method to modify the current description of this df
+            setDescriptionOfThisDF(getDescription());
+
+            // Register and federate this df with de default df
+            // to be registered as a child df, agent's description must declare a "fipa-df" service
+            DFService.register(this, parentName, getDescription());
+            //register the parent df
+            addParent(parentName, getDescription());
+
+            // Show the default gui of this DF
+            showGui();
         }
 
-        // Build the description used as template for subscription
-
-        private DFAgentDescription getDescription() {
-            DFAgentDescription dfd = new DFAgentDescription();
-            ServiceDescription sd = new ServiceDescription();
-
-            dfd.setName(getAID());
-            dfd.addServices(FIPANames.InteractionProtocol.FIPA_REQUEST);
-            dfd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
-            dfd.addOntologies("fish-auction-ontology");
-
-            // A "fipa-df" service is mandatory for the df federation
-            sd.setName(getLocalName() + "fish-auction-df");
-            sd.setType(serviceType);
-            dfd.addServices(sd);
+        catch (Exception e) {
+            e.printStackTrace();
         }
 
-        DFAgentDescription template = new DFAgentDescription;
-        ServiceDescription templateSd = new ServiceDescription;
-        templateSd.setType(serviceType);
-        template.addServices(templateSd);
+        // TODO : continuer le code
 
-        // Subscription to services
-        ACLMessage subs = DFService.createSubscriptionMessage(this, new AID ("market", AID.ISLOCALNAME), template, null);
+        // TODO : faire un "deregister" (ou "unregister" plutot ?) quand une enchère est finie : Permet aux agents de se désinscrire
+        // TODO : modify : Permet de modifier un enregistrement existant
+        // TODO : search : Permet de rechercher des services ou des agents
+
+
     }
 
 
+    private DFAgentDescription getDescription() {
+        DFAgentDescription dfd = new DFAgentDescription();
+        ServiceDescription sd = new ServiceDescription();
+
+        dfd.setName(getAID());
+        dfd.addProtocols(FIPANames.InteractionProtocol.FIPA_REQUEST);
+        dfd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
+        dfd.addOntologies("fish-auction-ontology");
+
+        //  A "fipa-df" service is mandatory for the df federation
+        sd.setName(getLocalName() + "fish-auction-df");
+        sd.setType(serviceType);
+        dfd.addServices(sd);
+        return dfd;
+    }
 
 
-    @Override
     protected void onGuiEvent(GuiEvent ev) {
         logger.info("Commande reçue depuis l'IHM : " + ev.getAllParameter());
     }
