@@ -68,7 +68,7 @@ public class VendeurGUI extends JFrame {
     }
 
     public void addComponentsToPane(final Container pane) {
-        setTitle(Vendeur.getName());
+        setTitle(agent.getName());
 
         price = new JTextField("1000");
         pas = new JTextField("50");

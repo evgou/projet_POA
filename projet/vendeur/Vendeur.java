@@ -145,7 +145,7 @@ public class Vendeur extends GuiAgent {
      */
     private class AttentePremiereOffre extends OneShotBehaviour {
         @Override
-        public int action() {
+        public void action() {
             logger.info("Arrivé dans la classe AttentePremiereOffre.");
             ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE); //CFP
             msg.setContent(String.valueOf(price));
@@ -159,11 +159,10 @@ public class Vendeur extends GuiAgent {
                 agentsPreneur.clear();
                 agentsPreneur.add(msgReceived.getSender());
                 logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
-                return FishMarketPerformatif.TO_BID;
-            }
-            else {
+              //  return FishMarketPerformatif.TO_BID;
+            } else {
                 price = price - pas;
-                return FishMarketPerformatif.TO_ANNOUNCE;
+              //  return FishMarketPerformatif.TO_ANNOUNCE;
             }
         }
     }
