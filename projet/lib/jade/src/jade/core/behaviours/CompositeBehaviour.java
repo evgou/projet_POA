@@ -80,14 +80,14 @@ public abstract class CompositeBehaviour extends Behaviour {
 	} 
 
 	/**
-     * Executes this <code>CompositeBehaviour</code>. This method
-     * executes children according to the scheduling policy
-     * defined by concrete subclasses that implements
-     * the <code>scheduleFirst()</code> and <code>scheduleNext()</code>
-     * methods.
-     *
-     * @return
-     */
+	 * Executes this <code>CompositeBehaviour</code>. This method
+	 * executes children according to the scheduling policy
+	 * defined by concrete subclasses that implements
+	 * the <code>scheduleFirst()</code> and <code>scheduleNext()</code>
+	 * methods.
+	 *
+	 * @return
+	 */
 	public final int action() {
 		if(starting) {
 			scheduleFirst();

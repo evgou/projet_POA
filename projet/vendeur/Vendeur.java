@@ -16,9 +16,10 @@ import jade.lang.acl.MessageTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import misc.FishMarketPerformatif;
 
 /**
- * On appelle cet agent (vendeur) avec en argument son nom et le nom du poisson de l'enchère
+ * On appelle cet agent (vendeur) avec en argument son nom
  */
 public class Vendeur extends GuiAgent {
     private static final Logger logger = Logger.getLogger(Vendeur.class.getName());
@@ -42,7 +43,7 @@ public class Vendeur extends GuiAgent {
     protected void setup() {
         logger.info("Agent Vendeur " + getName() + " is ready.");
 
-        // TODO : envoie d'un message au marché pour se faire connaitre
+        // Envoie d'un message au marché pour se faire connaitre et s'enregistrer dans la liste des vendeurs
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         msg.addReceiver(market);
         msg.setContent("0");
@@ -51,12 +52,10 @@ public class Vendeur extends GuiAgent {
 
         Object[] args = getArguments();
         // Vérifie s'il y a les arguments nécessaires
-        if (args != null && args.length > 1) {
+        if (args != null && args.length > 0) {
 
             gui = new VendeurGUI(this);
             gui.showGui();
-            agentsPreneur = new ArrayList<>();
-
 
             // FSM Behaviour
             FSMBehaviour fsm = new FSMBehaviour(this) {
@@ -69,25 +68,23 @@ public class Vendeur extends GuiAgent {
             };
 
             // Définition des états
-            fsm.registerFirstState (new SendPrice(), "CFP");
-            fsm.registerState(new WaitForMsg(this, 20000), "Wait");
-            fsm.registerState(new ReceivedPropose(), "Propose");
-            fsm.registerState(new HandleRefuse(), "Refuse");
-            fsm.registerState(new SendInform(), "Inform");
-            fsm.registerState(new SendAcceptProposal(), "Accept_proposal");
-            fsm.registerState(new ReceivedConfirm(), "Confirm");
-            fsm.registerLastState(new SendAgree(), "Agree");
+            fsm.registerState(new AttentePremiereOffre(), "1");
+            fsm.registerState(new AttenteSecondeOffre(), "2");
+            fsm.registerState(new AttenteAutresOffres(), "3");
+            fsm.registerState(new Attribution(), "4");
+            fsm.registerState(new AttentePaiement(), "5");
+            fsm.registerState(new Livraison(), "6");
 
             // Définition des transactions
-            fsm.registerDefaultTransition("CFP", "Wait");
-            fsm.registerTransition("Wait", "CFP", 1);
-            fsm.registerTransition("Wait", "Propose", 2);
-            fsm.registerTransition("Propose", "Refuse", 3);
-            fsm.registerTransition("Propose", "Inform", 4);
-            fsm.registerTransition("Refuse", "CFP", 5);
-            fsm.registerDefaultTransition("Inform", "Accept_proposal");
-            fsm.registerDefaultTransition("Accept_proposal", "Confirm");
-            fsm.registerDefaultTransition("Confirm", "Agree");
+            fsm.registerDefaultTransition("1", "1");
+            fsm.registerTransition("1", "1", FishMarketPerformatif.TO_ANNOUNCE);
+            fsm.registerTransition("1", "2", FishMarketPerformatif.TO_BID);
+            fsm.registerTransition("2", "3", FishMarketPerformatif.TO_BID);
+            fsm.registerTransition("2", "4", FishMarketPerformatif.REP_BID_OK);
+            fsm.registerTransition("3", "3", FishMarketPerformatif.TO_BID);
+            fsm.registerTransition("3", "0", FishMarketPerformatif.REP_BID_NOK);
+            fsm.registerTransition("4", "5", FishMarketPerformatif.TO_ATTRIBUTE);
+            fsm.registerTransition("5", "6", FishMarketPerformatif.TO_PAY);
 
             addBehaviour(fsm);
 
@@ -116,6 +113,7 @@ public class Vendeur extends GuiAgent {
             }
 
             // Gestion de l'abonnement des preneurs
+            // TODO : on recoit un message du marché pour connaitre les preneurs abonnés
 
 
 
@@ -139,163 +137,122 @@ public class Vendeur extends GuiAgent {
     // Définiton de tous les états possibles de l'automate
 
     /**
-     * SendPrice envoie le prix de base au marché
+     * <b>AttentePremiereOffre</b> envoie un message <i>TO_ANNONCE</i> au marché et attend une réponse.
+     * <ul>
+     *     <li>Si le vendeur reçoit un message SUSCRIBE, il ajoute le preneur à sa liste de preneurs d'abonnés.</li>
+     *     <li>Si le vendeur ne reçoit pas de message, il renvoit une offre plus faible.</li>
+     * </ul>
      */
-    private class SendPrice extends OneShotBehaviour {
+    private class AttentePremiereOffre extends OneShotBehaviour {
+        @Override
         public int action() {
-            logger.info("Arrivé dans la classe SendPrice.");
-            ACLMessage msg = new ACLMessage(ACLMessage.CFP);
+            logger.info("Arrivé dans la classe AttentePremiereOffre.");
+            ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE); //CFP
             msg.setContent(String.valueOf(price));
             msg.addReceiver(market);
             send(msg);
-            return 0;
-        }
-    }
 
-    /**
-     * <b>WaitForMsg</b> vérifie si après passé un délai de temps, il recoit des messages ou pas.
-     * <ul>
-     *     <li> si reception d'un message, on passe à l'état "Propose" qui gèrera le nombre de messages reçus </li>
-     *     <li> sinon, on baisse le prix en fonction du pas et on renvoit le nouveau prix </li>
-     * </ul>
-     */
-
-    //TODO : faire plutot un onTick
-    private class WaitForMsg extends WakerBehaviour {
-        public WaitForMsg(Agent a, long timeout) {
-            super(a, timeout);
-        }
-
-        @Override
-        protected void onWake() {
-            logger.info("Arrivé dans la classe WaitForMsg");
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.PROPOSE);
-            ACLMessage msg = myAgent.receive(mt);
-            if (msg != null) {
-                preneur = msg.getSender();
-
-                // Vérification que l'agent preneur n'est pas déjà dans la liste
-                if (!agentsPreneur.contains(msg.getSender())) {
-                    agentsPreneur.add(msg.getSender());
-                    logger.info("Ajout de " + msg.getSender().getLocalName() + " à la liste des agents preneurs.");
-                } else {
-                    logger.info(msg.getSender().getLocalName() + " est déjà dans la liste des agents preneurs.");
-                }
-                //return 2;
+            // TODO : vérifier comment on reçoit les messages SUBSCRIBE
+            MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); //PROPOSE
+            ACLMessage msgReceived = myAgent.receive(mt);
+            if (msgReceived != null) {
+                agentsPreneur.clear();
+                agentsPreneur.add(msgReceived.getSender());
+                logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
+                return FishMarketPerformatif.TO_BID;
             }
             else {
                 price = price - pas;
-                //return 1;
+                return FishMarketPerformatif.TO_ANNOUNCE;
             }
         }
     }
 
     /**
-     * <b>ReceivedPropose</b> recoit le premier message et est en attente d'autres messages
+     * <b>AttenteSecondeOffre</b> attend une seconde offre d'un autre preneur.
      * <ul>
-     *     <li> si d'autres messages sont reçus, on passe à l'état "Refuse"</li>
-     *     <li> si aucun autre message n'est reçu, c'est le seul preneur qui a fait une offre qui gagne l'enchère,
-     *     on va donc vers l'état SendInform pour l'en informer </li>
+     *     <li>Si un autre preneur envoie un message SUBSCRIBE, il l'ajoute à sa liste de preneurs abonnées
+     *     et va attendre d'autres offres dans la classe <b>AttenteAutresOffres</b></li>
+     *     <li>S'il ne reçoit pas de seconde offre, l'enchère est attribuée au preneur abonné.</li>
      * </ul>
      */
-    private static class ReceivedPropose extends OneShotBehaviour {
+    private class AttenteSecondeOffre extends OneShotBehaviour {
+        @Override
         public int action() {
-            logger.info("Arrivé dans la classe ReceivedPropose.");
-            // Vérification si un deuxième message est arrivé
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.PROPOSE);
-            ACLMessage msg = myAgent.receive(mt);
-            if (msg != null) {
-                return 3;
+            // TODO : mettre un compteur
+            logger.info("Arrivé dans la classe AttenteSecondeOffre.");
+            MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); //PROPOSE
+            ACLMessage msgReceived = myAgent.receive(mt);
+            if (msgReceived != null) {
+                agentsPreneur.add(msgReceived.getSender());
+                logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
+                return FishMarketPerformatif.TO_BID;
             }
             else {
-                return 4;
+                return FishMarketPerformatif.REP_BID_OK;
             }
         }
     }
 
     /**
-     * <b>HandleRefuse</b> augmente le prix et repasse à l'état CFP pour renvoyer de nouveaux messages
-     * // TODO : warning : faire attention car il faut le renvoyer aux preneux abonnés
-     *
+     * <b>AttenteAutresOffres</b> attend d'autres offre de potentiels preneurs.
+     * <ul>
+     *     <li>S'il en revoit d'autres</li>
+     * </ul>
      */
-    private class HandleRefuse extends OneShotBehaviour {
+    // TODO : mettre un compteur ?
+    private class AttenteAutresOffres extends OneShotBehaviour {
+        @Override
         public int action() {
-            logger.info("Arrivé dans la classe HandleRefuse.");
-            // Augmentation du prix car plusieurs preneurs
-            price = price + pas;
-            ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
-            // TODO : implémenter la liste agentsPreneur
-            for (AID pren : agentsPreneur) {
-                cfp.addReceiver(pren);
-            }
-            cfp.addReceiver(market);
-            cfp.setContent(String.valueOf(price));
-            myAgent.send(cfp);
-
-            return 0;
-            // TODO : doit retourner à l'état Wait
-        }
-    }
-
-
-    /**
-     * <b>SendInform</b> : récupère l'agent preneur qui a "gagné" les enchère et achetra donc le poisson
-     * et envoie un message INFORM à cet agent preneur (pour REP_BID_OK)
-     */
-    private class SendInform extends OneShotBehaviour {
-        public int action() {
-            logger.info("Arrivé dans la classe SendInform.");
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.PROPOSE);
-            ACLMessage msg = myAgent.receive(mt);
-            if (msg != null) {
-                ACLMessage msgInform = new ACLMessage(ACLMessage.INFORM);
-                msgInform.addReceiver(preneur);
-                send(msgInform);
-            }
-            else {
-                block();
+            logger.info("Arrivé dans la classe AttenteAutresOffres");
+            MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); // PROPOSE
+            ACLMessage msgReceived = myAgent.receive(mt);
+            if (msgReceived != null) {
+                agentsPreneur.add(msgReceived.getSender());
+                logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
             }
             return 0;
         }
     }
 
+
     /**
-     * <b>SendAcceptProposal</b> envoie un message ACCCEPT_PROPOSAL au preneur choisi
+     * <b>Attribution</b> envoie un message TO_ATTRIBUTE au seul preneur qui a répondu à l'offre.
      */
-    private class SendAcceptProposal extends OneShotBehaviour {
+    private class Attribution extends OneShotBehaviour {
         public int action() {
-            logger.info("Arrivé dans la classe SendAcceptProposal.");
-            ACLMessage msg = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
+            logger.info("Arrivé dans la classe Attribution.");
+            ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ATTRIBUTE); //ACCEPT_PROPOSAL
             // TODO : modifier new AID
-            msg.addReceiver(new AID("preneur", AID.ISLOCALNAME));
+            msg.addReceiver(agentsPreneur.get(0));
             send(msg);
-            return 0;
+            return FishMarketPerformatif.TO_ATTRIBUTE;
         }
     }
 
     /**
-     * <b>ReceivedConfirm</b> vérifie que le preneur confirme bien le message ACCEPT_PROPOSAL que le vendeur lui a envoyé
+     * <b>AttentePaiement</b> vérifie que le preneur confirme bien le message ACCEPT_PROPOSAL que le vendeur lui a envoyé
      */
-    private static class ReceivedConfirm extends OneShotBehaviour {
+    private static class AttentePaiement extends OneShotBehaviour {
         public int action() {
             logger.info("Arrivé dans la classe ReceivedConfirm.");
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CONFIRM);
+            MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_PAY); //CONFIRM
             ACLMessage msg = myAgent.receive(mt);
             if (msg == null) {
                 block();
             }
-            return 0;
+            return FishMarketPerformatif.TO_PAY;
         }
     }
 
     /**
      * <b>SendAgree</b> envoie un message AGREE au marché avec comme contenu le poisson et supprime l'agent
      */
-    private class SendAgree extends OneShotBehaviour {
+    private class Livraison extends OneShotBehaviour {
         public int action() {
             logger.info("Arrivé dans la classe SendAgree.");
             // Envoie le message AGREE (TO_GIVE) au marché pour l'informer de la fin de l'enchère
-            ACLMessage msg = new ACLMessage(ACLMessage.AGREE);
+            ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_GIVE); //AGREE
             // TODO : mettre le nom de l'enchère pour récupérer le nom du poisson
             msg.setContent("poisson");
             msg.addReceiver(new AID("market", AID.ISLOCALNAME));

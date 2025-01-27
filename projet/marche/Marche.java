@@ -23,14 +23,13 @@ public class Marche extends jade.domain.df {
     private List<String> preneurs;
     private List<String> offres;
 
-    private final String serviceType = "fishmarket";
-
     @Override
     protected void setup() {
-        logger.info("Agent" + getName() + " trying to subscribe for services of type " + serviceType);
         vendeurs = new ArrayList<>();
         preneurs = new ArrayList<>();
         offres = new ArrayList<>();
+        gui = new MarcheGUI(this);
+        gui.showGui();
 
         try {
             AID parentName = getDefaultDF();
@@ -78,15 +77,17 @@ public class Marche extends jade.domain.df {
             ACLMessage msg = myAgent.receive();
             while (msg != null) {
                 if (msg.getPerformative() == ACLMessage.INFORM) {
-                    if (msg.getContent() == "0") {
+                    if (msg.getContent().contentEquals("0")) {
                         vendeurs.add(msg.getSender().getLocalName());
                         logger.info("Liste des vendeurs : " + vendeurs);
                     }
-                    if (msg.getContent() == "1") {
+                    if (msg.getContent().contentEquals("1")) {
                         preneurs.add(msg.getSender().getLocalName());
                         logger.info("Liste des preneurs : " + preneurs);
                     }
                 }
+                msg = null;
+                msg = myAgent.receive();
             }
         }
     }
@@ -103,7 +104,7 @@ public class Marche extends jade.domain.df {
 
         //  A "fipa-df" service is mandatory for the df federation
         sd.setName(getLocalName() + "fish-auction-df");
-        sd.setType(serviceType);
+        sd.setType("fishmarket");
         dfd.addServices(sd);
         return dfd;
     }
