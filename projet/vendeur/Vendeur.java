@@ -177,7 +177,7 @@ public class Vendeur extends GuiAgent {
      */
     private class AttenteSecondeOffre extends OneShotBehaviour {
         @Override
-        public int action() {
+        public void action() {
             // TODO : mettre un compteur
             logger.info("Arrivé dans la classe AttenteSecondeOffre.");
             MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); //PROPOSE
@@ -185,10 +185,10 @@ public class Vendeur extends GuiAgent {
             if (msgReceived != null) {
                 agentsPreneur.add(msgReceived.getSender());
                 logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
-                return FishMarketPerformatif.TO_BID;
+             //   return FishMarketPerformatif.TO_BID;
             }
             else {
-                return FishMarketPerformatif.REP_BID_OK;
+           //     return FishMarketPerformatif.REP_BID_OK;
             }
         }
     }
@@ -202,7 +202,7 @@ public class Vendeur extends GuiAgent {
     // TODO : mettre un compteur ?
     private class AttenteAutresOffres extends OneShotBehaviour {
         @Override
-        public int action() {
+        public void action() {
             logger.info("Arrivé dans la classe AttenteAutresOffres");
             MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); // PROPOSE
             ACLMessage msgReceived = myAgent.receive(mt);
@@ -210,7 +210,7 @@ public class Vendeur extends GuiAgent {
                 agentsPreneur.add(msgReceived.getSender());
                 logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
             }
-            return 0;
+         //   return 0;
         }
     }
 
@@ -219,13 +219,13 @@ public class Vendeur extends GuiAgent {
      * <b>Attribution</b> envoie un message TO_ATTRIBUTE au seul preneur qui a répondu à l'offre.
      */
     private class Attribution extends OneShotBehaviour {
-        public int action() {
+        public void action() {
             logger.info("Arrivé dans la classe Attribution.");
             ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ATTRIBUTE); //ACCEPT_PROPOSAL
             // TODO : modifier new AID
             msg.addReceiver(agentsPreneur.get(0));
             send(msg);
-            return FishMarketPerformatif.TO_ATTRIBUTE;
+          //  return FishMarketPerformatif.TO_ATTRIBUTE;
         }
     }
 
@@ -233,14 +233,14 @@ public class Vendeur extends GuiAgent {
      * <b>AttentePaiement</b> vérifie que le preneur confirme bien le message ACCEPT_PROPOSAL que le vendeur lui a envoyé
      */
     private static class AttentePaiement extends OneShotBehaviour {
-        public int action() {
+        public void action() {
             logger.info("Arrivé dans la classe ReceivedConfirm.");
             MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_PAY); //CONFIRM
             ACLMessage msg = myAgent.receive(mt);
             if (msg == null) {
                 block();
             }
-            return FishMarketPerformatif.TO_PAY;
+           // return FishMarketPerformatif.TO_PAY;
         }
     }
 
@@ -248,7 +248,7 @@ public class Vendeur extends GuiAgent {
      * <b>SendAgree</b> envoie un message AGREE au marché avec comme contenu le poisson et supprime l'agent
      */
     private class Livraison extends OneShotBehaviour {
-        public int action() {
+        public void action() {
             logger.info("Arrivé dans la classe SendAgree.");
             // Envoie le message AGREE (TO_GIVE) au marché pour l'informer de la fin de l'enchère
             ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_GIVE); //AGREE
@@ -257,7 +257,7 @@ public class Vendeur extends GuiAgent {
             msg.addReceiver(new AID("market", AID.ISLOCALNAME));
             send(msg);
             doDelete();
-            return 0;
+         //   return 0;
         }
     }
 
