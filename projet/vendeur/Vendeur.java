@@ -1,6 +1,5 @@
 package vendeur;
 
-import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.core.AID;
 import jade.domain.DFService;
@@ -13,10 +12,11 @@ import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import misc.FishMarketPerformatif;
+
+import javax.swing.*;
 
 /**
  * On appelle cet agent (vendeur) avec en argument son nom
@@ -30,10 +30,11 @@ public class Vendeur extends GuiAgent {
     private List<AID> agentsPreneur;
 
 
-    // Valeur du prix et du pas par défaut pour le moment
-    // TODO : modifier et le mettre dans l'interface
-    private int price = 1000;
-    private final int pas = 50;
+    // Initialisation du nom, du prix initial et du pas de variation du prix
+    private String name;
+    private int price;
+    private int pas;
+    private int temps;
 
 
     /**
@@ -42,13 +43,6 @@ public class Vendeur extends GuiAgent {
     @Override
     protected void setup() {
         logger.info("Agent Vendeur " + getName() + " is ready.");
-
-        // Envoie d'un message au marché pour se faire connaitre et s'enregistrer dans la liste des vendeurs
-        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        msg.addReceiver(market);
-        msg.setContent("0");
-        send(msg);
-
 
         Object[] args = getArguments();
         // Vérifie s'il y a les arguments nécessaires
@@ -82,40 +76,11 @@ public class Vendeur extends GuiAgent {
             fsm.registerTransition("2", "3", FishMarketPerformatif.TO_BID);
             fsm.registerTransition("2", "4", FishMarketPerformatif.REP_BID_OK);
             fsm.registerTransition("3", "3", FishMarketPerformatif.TO_BID);
-            fsm.registerTransition("3", "0", FishMarketPerformatif.REP_BID_NOK);
+            fsm.registerTransition("3", "1", FishMarketPerformatif.REP_BID_NOK);
             fsm.registerTransition("4", "5", FishMarketPerformatif.TO_ATTRIBUTE);
             fsm.registerTransition("5", "6", FishMarketPerformatif.TO_PAY);
 
             addBehaviour(fsm);
-
-
-            // Description du service
-            String poisson = args[1].toString();
-            ServiceDescription sd = new ServiceDescription();
-            sd.setName(poisson);
-            sd.setType("fipa-df");
-            // TODO : à vérifier : fishamrket ou fipa-df
-            // Agents that want to use this service need to "know" the fish-auction-ontology
-            sd.addOntologies("fish-auction-ontology");
-            // Agents that want to use this service need to "speak" the FIPA-SL language
-            sd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
-            // TODO terminer le code
-
-            // Register the fishmarket service in the yellow pages
-            DFAgentDescription dfd = new DFAgentDescription();
-            dfd.setName(getAID());
-            dfd.addServices(sd);
-            try {
-                DFService.register(this, market, dfd);
-            }
-            catch (FIPAException fe) {
-                fe.printStackTrace();
-            }
-
-            // Gestion de l'abonnement des preneurs
-            // TODO : on recoit un message du marché pour connaitre les preneurs abonnés
-
-
 
         }
         else {
@@ -130,7 +95,37 @@ public class Vendeur extends GuiAgent {
      */
     @Override
     protected void onGuiEvent(GuiEvent ev) {
-        logger.info("Commande reçue depuis l'IHM : " + ev.getAllParameter());
+        int eventType = ev.getType();
+
+        if (eventType == 1) { // Vérification du type d'event
+            name = (String) ev.getParameter(0);
+            price = (Integer) ev.getParameter(1);
+            pas = (Integer) ev.getParameter(2);
+            temps = (Integer) ev.getParameter(3);
+
+            logger.info("Enchère reçue : " + name + " à " + price + "€ avec une variation de " + pas + "€.");
+
+            // Description du service
+            ServiceDescription sd = new ServiceDescription();
+            sd.setName(name);
+            sd.setType("Fishmarket");
+            // Agents that want to use this service need to "know" the fish-auction-ontology
+            sd.addOntologies("fish-auction-ontology");
+            // Agents that want to use this service need to "speak" the FIPA-SL language
+            sd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
+
+            // Register the fishmarket service in the yellow pages
+            DFAgentDescription dfd = new DFAgentDescription();
+            dfd.setName(getAID());
+            dfd.addServices(sd);
+            try {
+                DFService.register(this, getDefaultDF(), dfd);
+            }
+            catch (FIPAException fe) {
+                fe.printStackTrace();
+            }
+        }
+
     }
 
 
@@ -144,6 +139,7 @@ public class Vendeur extends GuiAgent {
      * </ul>
      */
     private class AttentePremiereOffre extends OneShotBehaviour {
+        private int returnPerformatif;
         @Override
         public void action() {
             logger.info("Arrivé dans la classe AttentePremiereOffre.");
@@ -153,17 +149,33 @@ public class Vendeur extends GuiAgent {
             send(msg);
 
             // TODO : vérifier comment on reçoit les messages SUBSCRIBE
+            long start = System.currentTimeMillis();
+            while (System.currentTimeMillis() - start < temps * 1000) {
+                MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
+                ACLMessage msgReceived = myAgent.receive(mt);
+                if (msgReceived != null) {
+                    agentsPreneur.add(msgReceived.getSender());
+                    logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
+                    }
+                }
+            }
+
             MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); //PROPOSE
             ACLMessage msgReceived = myAgent.receive(mt);
             if (msgReceived != null) {
                 agentsPreneur.clear();
                 agentsPreneur.add(msgReceived.getSender());
                 logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
-              //  return FishMarketPerformatif.TO_BID;
+                returnPerformatif = FishMarketPerformatif.TO_BID;
             } else {
                 price = price - pas;
-              //  return FishMarketPerformatif.TO_ANNOUNCE;
+                returnPerformatif =  FishMarketPerformatif.TO_ANNOUNCE;
             }
+        }
+
+        @Override
+        public int onEnd() {
+            return returnPerformatif;
         }
     }
 
@@ -176,41 +188,79 @@ public class Vendeur extends GuiAgent {
      * </ul>
      */
     private class AttenteSecondeOffre extends OneShotBehaviour {
+        private int returnPerformatif;
         @Override
         public void action() {
             // TODO : mettre un compteur
             logger.info("Arrivé dans la classe AttenteSecondeOffre.");
+
+            long start = System.currentTimeMillis();
+            while (System.currentTimeMillis() - start < temps * 1000) {
+                MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
+                ACLMessage msgReceived = myAgent.receive(mt);
+                if (msgReceived != null) {
+                    agentsPreneur.add(msgReceived.getSender());
+                    logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
+                }
+            }
             MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); //PROPOSE
             ACLMessage msgReceived = myAgent.receive(mt);
             if (msgReceived != null) {
                 agentsPreneur.add(msgReceived.getSender());
                 logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
-             //   return FishMarketPerformatif.TO_BID;
+                returnPerformatif = FishMarketPerformatif.TO_BID;
+            } else {
+                returnPerformatif =  FishMarketPerformatif.REP_BID_OK;
             }
-            else {
-           //     return FishMarketPerformatif.REP_BID_OK;
-            }
+        }
+        // TODO : ajouter le temps d'attente
+
+        @Override
+        public int onEnd() {
+            return returnPerformatif;
         }
     }
 
     /**
      * <b>AttenteAutresOffres</b> attend d'autres offre de potentiels preneurs.
      * <ul>
-     *     <li>S'il en revoit d'autres</li>
+     *     <li>S'il en recoit d'autres, il reste dans cette classe.</li>
+     *     <li>S'il n'en recoit pas d'autres durant le laps de temps indiqué,
+     *     il retourne dans la classe <b>AttentePremiereOffre</b> pour renvoyer une offre avec un prix plus élevé.</li>
      * </ul>
      */
-    // TODO : mettre un compteur ?
+    // TODO : mettre un compteur ? oui le temps d'attente
     private class AttenteAutresOffres extends OneShotBehaviour {
+        private int returnPerformatif;
         @Override
         public void action() {
             logger.info("Arrivé dans la classe AttenteAutresOffres");
+
+            long start = System.currentTimeMillis();
+            while (System.currentTimeMillis() - start < temps * 1000) {
+                MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
+                ACLMessage msgReceived = myAgent.receive(mt);
+                if (msgReceived != null) {
+                    agentsPreneur.add(msgReceived.getSender());
+                    logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
+                }
+            }
+
             MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); // PROPOSE
             ACLMessage msgReceived = myAgent.receive(mt);
             if (msgReceived != null) {
                 agentsPreneur.add(msgReceived.getSender());
                 logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
+                returnPerformatif = FishMarketPerformatif.TO_BID;
+            } else {
+                price = price + pas;
+                returnPerformatif =  FishMarketPerformatif.REP_BID_NOK;
             }
-         //   return 0;
+        }
+
+        @Override
+        public int onEnd() {
+            return returnPerformatif;
         }
     }
 
@@ -219,13 +269,18 @@ public class Vendeur extends GuiAgent {
      * <b>Attribution</b> envoie un message TO_ATTRIBUTE au seul preneur qui a répondu à l'offre.
      */
     private class Attribution extends OneShotBehaviour {
+        @Override
         public void action() {
             logger.info("Arrivé dans la classe Attribution.");
             ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ATTRIBUTE); //ACCEPT_PROPOSAL
             // TODO : modifier new AID
             msg.addReceiver(agentsPreneur.get(0));
             send(msg);
-          //  return FishMarketPerformatif.TO_ATTRIBUTE;
+        }
+
+        @Override
+        public int onEnd() {
+            return FishMarketPerformatif.TO_ATTRIBUTE;
         }
     }
 
@@ -233,6 +288,7 @@ public class Vendeur extends GuiAgent {
      * <b>AttentePaiement</b> vérifie que le preneur confirme bien le message ACCEPT_PROPOSAL que le vendeur lui a envoyé
      */
     private static class AttentePaiement extends OneShotBehaviour {
+        @Override
         public void action() {
             logger.info("Arrivé dans la classe ReceivedConfirm.");
             MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_PAY); //CONFIRM
@@ -240,7 +296,11 @@ public class Vendeur extends GuiAgent {
             if (msg == null) {
                 block();
             }
-           // return FishMarketPerformatif.TO_PAY;
+        }
+
+        @Override
+        public int onEnd() {
+            return FishMarketPerformatif.TO_PAY;
         }
     }
 
@@ -248,6 +308,7 @@ public class Vendeur extends GuiAgent {
      * <b>SendAgree</b> envoie un message AGREE au marché avec comme contenu le poisson et supprime l'agent
      */
     private class Livraison extends OneShotBehaviour {
+        @Override
         public void action() {
             logger.info("Arrivé dans la classe SendAgree.");
             // Envoie le message AGREE (TO_GIVE) au marché pour l'informer de la fin de l'enchère
@@ -257,7 +318,11 @@ public class Vendeur extends GuiAgent {
             msg.addReceiver(new AID("market", AID.ISLOCALNAME));
             send(msg);
             doDelete();
-         //   return 0;
+        }
+
+        @Override
+        public int onEnd() {
+            return FishMarketPerformatif.TO_GIVE;
         }
     }
 
@@ -273,7 +338,6 @@ public class Vendeur extends GuiAgent {
 
         // Ferme le GUI
         gui.dispose();
-
         logger.info("Agent Vendeur " + getName() + " done.");
     }
 

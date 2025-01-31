@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 public class MarcheGUI extends JFrame {
     private final Marche agent;
     private JTextArea logArea;
-    private JTextField commandField;
     private static final Logger logger = Logger.getLogger(MarcheGUI.class.getName());
 
 
@@ -34,14 +33,10 @@ public class MarcheGUI extends JFrame {
         logArea.setEditable(false);
         add(new JScrollPane(logArea), BorderLayout.CENTER);
 
-        JPanel commandPanel = new JPanel();
-        commandField = new JTextField(20);
-        JButton sendButton = new JButton("Envoyer");
-        sendButton.addActionListener((ActionEvent e) -> sendCommand());
-        commandPanel.add(commandField);
-        commandPanel.add(sendButton);
+    }
 
-        add(commandPanel, BorderLayout.SOUTH);
+    public void updateTable() {
+        // TODO : implémenter la mise à jour
     }
 
     public void updateLog(String message) {
@@ -50,15 +45,6 @@ public class MarcheGUI extends JFrame {
 
     public void showGui() {
         SwingUtilities.invokeLater(() -> setVisible(true));
-    }
-
-    private void sendCommand() {
-        String command = commandField.getText();
-        if (!command.isEmpty()) {
-            GuiEvent event = new GuiEvent((Object)this, 2);
-            event.addParameter((Object) command);
-            agent.postGuiEvent(event);
-        }
     }
 
 }

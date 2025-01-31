@@ -8,6 +8,8 @@ import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames;
 import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import misc.FishMarketPerformatif;
 import vendeur.Vendeur;
 
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public class Marche extends jade.domain.df {
         vendeurs = new ArrayList<>();
         preneurs = new ArrayList<>();
         offres = new ArrayList<>();
+
         gui = new MarcheGUI(this);
         gui.showGui();
 
@@ -55,7 +58,10 @@ public class Marche extends jade.domain.df {
             e.printStackTrace();
         }
 
-        addBehaviour(new RegisterAgents(this, 2000));
+        enregistrementService();
+
+
+
 
         // TODO : continuer le code
 
@@ -65,31 +71,6 @@ public class Marche extends jade.domain.df {
         // TODO : search : Permet de rechercher des services ou des agents
 
 
-    }
-
-    private class RegisterAgents extends WakerBehaviour {
-
-        public RegisterAgents(Agent a, long timeout) {
-            super(a, timeout);
-        }
-
-        protected void onWake() {
-            ACLMessage msg = myAgent.receive();
-            while (msg != null) {
-                if (msg.getPerformative() == ACLMessage.INFORM) {
-                    if (msg.getContent().contentEquals("0")) {
-                        vendeurs.add(msg.getSender().getLocalName());
-                        logger.info("Liste des vendeurs : " + vendeurs);
-                    }
-                    if (msg.getContent().contentEquals("1")) {
-                        preneurs.add(msg.getSender().getLocalName());
-                        logger.info("Liste des preneurs : " + preneurs);
-                    }
-                }
-                msg = null;
-                msg = myAgent.receive();
-            }
-        }
     }
 
 
@@ -107,6 +88,39 @@ public class Marche extends jade.domain.df {
         sd.setType("fishmarket");
         dfd.addServices(sd);
         return dfd;
+    }
+
+    private void enregistrementService() {
+        try {
+            DFAgentDescription dfd = getDescription();
+            DFService.register(this, dfd);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class EvolutionPrixEnchere extends CyclicBehaviour {
+
+        @Override
+        public void action() {
+            MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_ANNOUNCE);
+            ACLMessage msg = myAgent.receive(mt);
+            if (msg != null) {
+                String price = msg.getContent();
+                String vendeur = msg.getSender().getLocalName();
+                logger.info("Nouveau prix pour " + vendeur + " de " + price + " €.");
+                int indexVendeur = vendeurs.indexOf(vendeur);
+                if (indexVendeur != -1) {
+                    offres.set(indexVendeur, price);
+                } else {
+                    vendeurs.add(vendeur);
+                    offres.add(price);
+                }
+            } else {
+                block();
+            }
+        }
     }
 
 
