@@ -1,5 +1,7 @@
 package vendeur;
 
+import jade.gui.GuiAgent;
+
 import jade.gui.GuiEvent;
 
 import javax.swing.*;
@@ -7,7 +9,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.Delayed;
 import java.util.logging.Logger;
 
 public class VendeurGUI extends JFrame {
@@ -15,7 +16,7 @@ public class VendeurGUI extends JFrame {
     private static final Logger logger = Logger.getLogger(VendeurGUI.class.getName());
 
     private static final String Publication = "Publication";
-    private final Vendeur agent;
+    private final GuiAgent agent;
     private JTextField ChampPrice;
     private JTextField ChampPas;
     private JTextField ChampName;
@@ -25,7 +26,7 @@ public class VendeurGUI extends JFrame {
     private DefaultTableModel modeleTableau;
 
 
-    public VendeurGUI(Vendeur agent) {
+    public VendeurGUI(GuiAgent agent) {
         this.agent = agent;
         logger.info("Vendeur GUI initialized");
 

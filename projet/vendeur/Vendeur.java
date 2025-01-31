@@ -14,13 +14,10 @@ import jade.lang.acl.MessageTemplate;
 
 import java.util.List;
 import java.util.logging.Logger;
+
 import misc.FishMarketPerformatif;
 
-import javax.swing.*;
 
-/**
- * On appelle cet agent (vendeur) avec en argument son nom
- */
 public class Vendeur extends GuiAgent {
     private static final Logger logger = Logger.getLogger(Vendeur.class.getName());
     private VendeurGUI gui;
@@ -82,8 +79,7 @@ public class Vendeur extends GuiAgent {
 
             addBehaviour(fsm);
 
-        }
-        else {
+        } else {
             // Termine l'agent
             System.out.println("Pas de nom de poisson spécifié.");
             doDelete();
@@ -120,8 +116,7 @@ public class Vendeur extends GuiAgent {
             dfd.addServices(sd);
             try {
                 DFService.register(this, getDefaultDF(), dfd);
-            }
-            catch (FIPAException fe) {
+            } catch (FIPAException fe) {
                 fe.printStackTrace();
             }
         }
@@ -140,6 +135,7 @@ public class Vendeur extends GuiAgent {
      */
     private class AttentePremiereOffre extends OneShotBehaviour {
         private int returnPerformatif;
+
         @Override
         public void action() {
             logger.info("Arrivé dans la classe AttentePremiereOffre.");
@@ -156,7 +152,6 @@ public class Vendeur extends GuiAgent {
                 if (msgReceived != null) {
                     agentsPreneur.add(msgReceived.getSender());
                     logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
-                    }
                 }
             }
 
@@ -169,7 +164,7 @@ public class Vendeur extends GuiAgent {
                 returnPerformatif = FishMarketPerformatif.TO_BID;
             } else {
                 price = price - pas;
-                returnPerformatif =  FishMarketPerformatif.TO_ANNOUNCE;
+                returnPerformatif = FishMarketPerformatif.TO_ANNOUNCE;
             }
         }
 
@@ -189,6 +184,7 @@ public class Vendeur extends GuiAgent {
      */
     private class AttenteSecondeOffre extends OneShotBehaviour {
         private int returnPerformatif;
+
         @Override
         public void action() {
             // TODO : mettre un compteur
@@ -210,7 +206,7 @@ public class Vendeur extends GuiAgent {
                 logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
                 returnPerformatif = FishMarketPerformatif.TO_BID;
             } else {
-                returnPerformatif =  FishMarketPerformatif.REP_BID_OK;
+                returnPerformatif = FishMarketPerformatif.REP_BID_OK;
             }
         }
         // TODO : ajouter le temps d'attente
@@ -229,9 +225,10 @@ public class Vendeur extends GuiAgent {
      *     il retourne dans la classe <b>AttentePremiereOffre</b> pour renvoyer une offre avec un prix plus élevé.</li>
      * </ul>
      */
-    // TODO : mettre un compteur ? oui le temps d'attente
+// TODO : mettre un compteur ? oui le temps d'attente
     private class AttenteAutresOffres extends OneShotBehaviour {
         private int returnPerformatif;
+
         @Override
         public void action() {
             logger.info("Arrivé dans la classe AttenteAutresOffres");
@@ -254,7 +251,7 @@ public class Vendeur extends GuiAgent {
                 returnPerformatif = FishMarketPerformatif.TO_BID;
             } else {
                 price = price + pas;
-                returnPerformatif =  FishMarketPerformatif.REP_BID_NOK;
+                returnPerformatif = FishMarketPerformatif.REP_BID_NOK;
             }
         }
 
@@ -331,8 +328,7 @@ public class Vendeur extends GuiAgent {
         // Demande au DF de supprimer les services qui ont été inscrits par l'agent
         try {
             DFService.deregister(this);
-        }
-        catch (FIPAException fe) {
+        } catch (FIPAException fe) {
             fe.printStackTrace();
         }
 
