@@ -127,7 +127,7 @@ public class Vendeur extends GuiAgent {
     // Définiton de tous les états possibles de l'automate
 
     /**
-     * <b>AttentePremiereOffre</b> envoie un message <i>TO_ANNONCE</i> au marché et attend une réponse.
+     * <b>AttentePremiereOffre</b> envoie un message <i>TO_ANNOUNCE</i> au marché et attend une réponse.
      * <ul>
      *     <li>Si le vendeur reçoit un message SUSCRIBE, il ajoute le preneur à sa liste de preneurs d'abonnés.</li>
      *     <li>Si le vendeur ne reçoit pas de message, il renvoit une offre plus faible.</li>
@@ -187,7 +187,6 @@ public class Vendeur extends GuiAgent {
 
         @Override
         public void action() {
-            // TODO : mettre un compteur
             logger.info("Arrivé dans la classe AttenteSecondeOffre.");
 
             long start = System.currentTimeMillis();
@@ -209,7 +208,6 @@ public class Vendeur extends GuiAgent {
                 returnPerformatif = FishMarketPerformatif.REP_BID_OK;
             }
         }
-        // TODO : ajouter le temps d'attente
 
         @Override
         public int onEnd() {
@@ -225,7 +223,6 @@ public class Vendeur extends GuiAgent {
      *     il retourne dans la classe <b>AttentePremiereOffre</b> pour renvoyer une offre avec un prix plus élevé.</li>
      * </ul>
      */
-// TODO : mettre un compteur ? oui le temps d'attente
     private class AttenteAutresOffres extends OneShotBehaviour {
         private int returnPerformatif;
 
@@ -310,9 +307,8 @@ public class Vendeur extends GuiAgent {
             logger.info("Arrivé dans la classe SendAgree.");
             // Envoie le message AGREE (TO_GIVE) au marché pour l'informer de la fin de l'enchère
             ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_GIVE); //AGREE
-            // TODO : mettre le nom de l'enchère pour récupérer le nom du poisson
-            msg.setContent("poisson");
-            msg.addReceiver(new AID("market", AID.ISLOCALNAME));
+            msg.setContent(name);
+            msg.addReceiver(market);
             send(msg);
             doDelete();
         }
