@@ -233,7 +233,7 @@ public class Vendeur extends GuiAgent {
                 MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
                 ACLMessage msgReceived = myAgent.receive(mt);
                 if (msgReceived != null) {
-                    agentsPreneur.add(msgReceived.getSender());
+                   // agentsPreneur.add(msgReceived.getSender());
                     logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
                 } else {
                     block();
@@ -242,7 +242,7 @@ public class Vendeur extends GuiAgent {
             MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); //PROPOSE
             ACLMessage msgReceived = myAgent.receive(mt);
             if (msgReceived != null) {
-                agentsPreneur.add(msgReceived.getSender());
+               // agentsPreneur.add(msgReceived.getSender());
                 logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
                 returnPerformatif = FishMarketPerformatif.TO_BID;
             } else {
