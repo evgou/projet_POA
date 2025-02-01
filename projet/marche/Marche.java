@@ -13,6 +13,8 @@ import misc.FishMarketPerformatif;
 import vendeur.Vendeur;
 
 import javax.swing.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -20,9 +22,12 @@ public class Marche extends jade.domain.df {
     private static final Logger logger = Logger.getLogger(Vendeur.class.getName());
     private MarcheGUI gui;
 
-    public static AID[] vendeurs = new AID[5];
+
+
+    // Liste des offres / vendeurs (1 offre par vendeur)
+    public static Map<String, Offre> offres = new HashMap<>();
     public static AID[] preneurs = new AID[5];
-    public static String[] offres =  new String[5];
+    // public static String[] offres =  new String[5];
 
     @Override
     protected void setup() {
@@ -106,16 +111,26 @@ public class Marche extends jade.domain.df {
                         enregistrementPreneur(msg.getSender());
                         AID preneur = msg.getSender();
                         logger.info("Le preneur " + preneur.getName() + " veut s'abonner.");
-                        for (AID vendeur : vendeurs) {
-                            envoyerSubscribeVendeur(vendeur, preneur);
-                        }
+                        // TODO
+                        //for (AID vendeur : vendeurs) {
+                        //    envoyerSubscribeVendeur(vendeur, preneur);
+                        //}
                         break;
 
                     case FishMarketPerformatif.TO_ANNOUNCE:
-                        AID vendeurName = msg.getSender();
+                        AID vendeurAID = msg.getSender();
                         String price = msg.getContent();
-                        majListVendeur();
-                        enregistrementOffre(vendeurName, price);
+                        offres.put(vendeurAID.getName(), new Offre(vendeurAID, price));
+                        logger.info("Enregistrement de l'offre pour " + vendeurAID.getName());
+                        gui.updateTable();
+
+                        // TODO A SUPPRIMER APR7S RECEPTION PRENEUR
+                        if (Integer.parseInt(price) < 50) {
+                            ACLMessage sub = new ACLMessage(ACLMessage.SUBSCRIBE);
+                            sub.addReceiver(vendeurAID);
+                            sub.ad
+                            send(sub);
+                        }
                         break;
                 }
             } else {
@@ -180,7 +195,7 @@ public class Marche extends jade.domain.df {
 
     /**
      * Dans cette classe, les vendeurs sont stockés dans le tableau <b>vendeurs</b> sous forme d'AID.
-     */
+
     private void majListVendeur() {
         DFAgentDescription template = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
@@ -224,6 +239,7 @@ public class Marche extends jade.domain.df {
         }
         gui.updateTable(vendeur, offre);
     }
+     */
 
     private void envoyerSubscribeVendeur(AID vendeur, AID preneur) {
         ACLMessage subs = new ACLMessage(ACLMessage.SUBSCRIBE);
@@ -263,4 +279,6 @@ public class Marche extends jade.domain.df {
         gui.dispose();
         logger.info("Agent " + getName() + " terminating.");
     }
+
+
 }

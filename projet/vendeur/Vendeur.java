@@ -13,7 +13,9 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import misc.FishMarketPerformatif;
@@ -29,7 +31,7 @@ public class Vendeur extends GuiAgent {
 
     private AID market = new AID("market", AID.ISLOCALNAME);
     private AID preneur = null;
-    private List<AID> agentsPreneur;
+    private Map<String, AID> agentsPreneurs = new HashMap<String, AID>();
 
 
     // Initialisation du nom, du prix initial et du pas de variation du prix
@@ -37,7 +39,7 @@ public class Vendeur extends GuiAgent {
     private int price;
     private int pas;
     private int temps;
-
+    private long start;
 
 
     /**
@@ -50,10 +52,10 @@ public class Vendeur extends GuiAgent {
         Object[] args = getArguments();
         // Vérifie s'il y a les arguments nécessaires
         if (args != null && args.length > 0) {
-            List<AID> agentsPreneur = new ArrayList<>();
 
             gui = new VendeurGUI(this);
             gui.showGui();
+
 
             // FSM Behaviour
             FSMBehaviour fsm = new FSMBehaviour(this) {
@@ -66,7 +68,7 @@ public class Vendeur extends GuiAgent {
             };
 
             // Définition des états
-            fsm.registerState(new AttentePremiereOffre(), "1");
+            fsm.registerFirstState(new AttentePremiereOffre(), "1");
             fsm.registerState(new AttenteSecondeOffre(), "2");
             fsm.registerState(new AttenteAutresOffres(), "3");
             fsm.registerState(new Attribution(), "4");
@@ -123,7 +125,7 @@ public class Vendeur extends GuiAgent {
             dfd.setName(getAID());
             dfd.addServices(sd);
             try {
-                DFService.register(this, new AID ("market", AID.ISLOCALNAME), dfd);
+                DFService.register(this, new AID("market", AID.ISLOCALNAME), dfd);
             } catch (FIPAException fe) {
                 fe.printStackTrace();
             }
@@ -146,45 +148,70 @@ public class Vendeur extends GuiAgent {
 
         @Override
         public void action() {
-            logger.info("Envoie d'un message TO-ANNONCE");
-            ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE); //CFP
-            msg.setContent(String.valueOf(price));
-            msg.addReceiver(market);
-            send(msg);
-            logger.info("Message " + msg.getContent() + " envoyé");
+            //sendOffre();
+
+            if (temps > 0) {
+                //logger.info("Temps d'attente enregistré = " + temps);
 
 
-            long start = System.currentTimeMillis();
-            while (System.currentTimeMillis() - start < temps * 1000L) {
                 MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
                 ACLMessage msgReceived = myAgent.receive(mt);
                 if (msgReceived != null) {
-                    agentsPreneur.add(msgReceived.getSender());
+                    String preneur = msgReceived.getContent();
+                    agentsPreneurs.add(msgReceived.getSender());
                     logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
-                } else {
-                    block();
                 }
-            }
 
-            MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); //PROPOSE
-            ACLMessage msgReceived = myAgent.receive(mt);
-            if (msgReceived != null) {
-                agentsPreneur.clear();
-                agentsPreneur.add(msgReceived.getSender());
-                logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
-                returnPerformatif = FishMarketPerformatif.TO_BID;
-            } else {
-                price = price - pas;
-                returnPerformatif = FishMarketPerformatif.TO_ANNOUNCE;
+
+
+
+
+                if (System.currentTimeMillis() - start > temps * 1000L) {
+                    /*
+                    MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); //PROPOSE
+                    ACLMessage msgReceived = myAgent.receive(mt);
+                    if (msgReceived != null) {
+                        agentsPreneur.clear();
+                        agentsPreneur.add(msgReceived.getSender());
+                        logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
+                        returnPerformatif = FishMarketPerformatif.TO_BID;
+                    } else {
+
+                     */
+                        price = price - pas;
+                        if (price >= 0) {
+                            sendOffre();
+                            returnPerformatif = FishMarketPerformatif.TO_ANNOUNCE;
+                        } else {
+                            // TODO : voir comportement
+                            //logger.info("Le prix est négatif.");
+                        }
+
+                    //}
+                }
             }
         }
 
         @Override
         public int onEnd() {
-            logger.info("Vendeur end : " + returnPerformatif);
+            //logger.info("Vendeur end : " + returnPerformatif);
             return returnPerformatif;
         }
     }
+
+    /**
+     * Envoie une offre au marché via un ACLMessage
+     */
+    public void sendOffre() {
+        ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE); //CFP
+        msg.setContent(String.valueOf(price));
+        msg.addReceiver(market);
+        send(msg);
+        logger.info("Message " + msg.getContent() + " envoyé");
+        start = System.currentTimeMillis(); // Enregistrement du début de l'envoie de l'offre
+        logger.info("start " + start);
+    }
+
 
     /**
      * <b>AttenteSecondeOffre</b> attend une seconde offre d'un autre preneur.
@@ -297,7 +324,7 @@ public class Vendeur extends GuiAgent {
     /**
      * <b>AttentePaiement</b> vérifie que le preneur confirme bien le message ACCEPT_PROPOSAL que le vendeur lui a envoyé
      */
-    private static class AttentePaiement extends OneShotBehaviour {
+    private class AttentePaiement extends OneShotBehaviour {
         @Override
         public void action() {
             logger.info("Arrivé dans la classe ReceivedConfirm.");

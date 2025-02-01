@@ -104,10 +104,13 @@ public class VendeurGUI extends JFrame {
             DefaultTableModel model = (DefaultTableModel) tableauEnchere.getModel();
             model.addRow(new Object[]{name, price, ""});
 
+            agent.sendOffre();
+            /*
             ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE); //CFP
             msg.setContent(String.valueOf(price));
             msg.addReceiver(agent.getMarket());
             agent.send(msg);
+             */
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Veuillez entrer des nombres valides.", "Erreur", JOptionPane.ERROR_MESSAGE);
