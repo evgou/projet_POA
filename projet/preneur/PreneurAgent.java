@@ -1,9 +1,12 @@
 package preneur;
 
+import jade.core.AID;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.gui.GuiAgent;
 import jade.gui.GuiEvent;
+import jade.lang.acl.ACLMessage;
+import misc.FishMarketPerformatif;
 
 import java.util.logging.Logger;
 
@@ -22,8 +25,26 @@ public class PreneurAgent extends GuiAgent {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			myName = (String) args[0];
-			PreneurAgentGUI gui = new PreneurAgentGUI(this);
-			gui.showGui();
+			try{
+				PreneurAgentGUI gui = new PreneurAgentGUI(this);
+				gui.showGui();
+			} catch (Exception e) {
+				logger.severe("Erreur de sauvegarde de l'agent : " + e.toString());
+			}
+
+			System.out.println("Agent " + getAID().getLocalName() + " est arrivé avant GUI");
+
+			try {
+				// Envoie du message pour signaler sa présence à l'agent Marché
+				ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE);
+				msg.addReceiver(new AID("market", AID.ISLOCALNAME));
+				msg.setContent("1");
+				send(msg);
+				logger.info("ACLMessage : " + msg.getPerformative());
+			}
+			catch (Exception e) {
+				logger.severe("Erreur du message de " + getAID().getLocalName() + " : " + e.getMessage());
+			}
 		}
 		else {
 			// Make the agent terminate

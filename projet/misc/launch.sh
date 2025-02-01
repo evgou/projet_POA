@@ -10,9 +10,9 @@ export CLASSPATH=.:../lib/jade/lib/jade.jar:../lib/jade/lib/commons-codec/common
 #java jade.Boot -gui -agents "A1:marche.Marche(Pierre)"
 
 # Compile et exécute l'agent PreneurAgent
-#javac -d ../classes ../preneur/PreneurAgent.java ../preneur/PreneurAgentGUI.java
-#java jade.Boot -gui -agents "Pierre:preneur.PreneurAgent(Rocher);Paul:preneur.PreneurAgent(Paulo)"
+javac -d ../classes ../preneur/PreneurAgent.java ../preneur/PreneurAgentGUI.java #../misc/FishMarketPerformatif.java
+java jade.Boot -gui -agents "Pierre:preneur.PreneurAgent(Rocher);Paul:preneur.PreneurAgent(Paulo)"
 
 # Compile et exécute l'agent Marché + Vendeur
-javac -d ../classes ../vendeur/* ../marche/*
-java jade.Boot -gui -agents "Manu:marche.MarcheAgent(Manu);Victor:vendeur.VendeurAgent(Victor);Vincent:vendeur.VendeurAgent(Vincent)"
+#javac -d ../classes ../vendeur/* ../marche/*
+#java jade.Boot -gui -agents "Manu:marche.MarcheAgent(Manu);Victor:vendeur.VendeurAgent(Victor);Vincent:vendeur.VendeurAgent(Vincent)"

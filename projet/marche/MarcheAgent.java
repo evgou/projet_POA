@@ -67,7 +67,6 @@ public class MarcheAgent extends jade.domain.df {
                         logger.info("Liste des preneurs : " + preneurs);
                     }
                 }
-                msg = null;
                 msg = myAgent.receive();
             }
         }

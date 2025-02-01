@@ -24,11 +24,8 @@ public class VendeurAgentGUI extends JFrame {
 
         setTitle(agent.getLocalName());
         setSize(1000, 300);
-        //setIconImage(Toolkit.getDefaultToolkit().getImage("/home/alicia/Documents/M2/POA/projet_POA/projet/misc/images/poisson.png"));
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //logger.info("Je suis là");
-
 
         logArea = new JTextArea();
         logArea.setEditable(false);

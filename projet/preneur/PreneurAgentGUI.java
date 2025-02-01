@@ -22,12 +22,9 @@ public class PreneurAgentGUI extends JFrame {
     public PreneurAgentGUI(PreneurAgent agent) {
         this.agent = agent;
 
-        ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/javax/swing/plaf/metal/icons/Folder.gif")));
-        setIconImage(icon.getImage());
 
         setTitle(agent.getLocalName());
         setSize(1000, 300);
-        //setIconImage(Toolkit.getDefaultToolkit().getImage("/home/alicia/Documents/M2/POA/projet_POA/projet/misc/images/poisson.png"));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         logger.info("Je suis là");
