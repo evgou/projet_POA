@@ -9,7 +9,10 @@ import jade.domain.FIPANames;
 import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 import misc.FishMarketPerformatif;
+//import preneur.Preneur;
+import misc.Prix;
 import vendeur.Vendeur;
 
 import javax.swing.*;
@@ -26,19 +29,12 @@ public class Marche extends jade.domain.df {
 
     // Liste des offres / vendeurs (1 offre par vendeur)
     public static Map<String, Offre> offres = new HashMap<>();
-    public static AID[] preneurs = new AID[5];
-    // public static String[] offres =  new String[5];
+    //public static Map<String, Preneur> preneurs = new HashMap<>();
 
     @Override
     protected void setup() {
 
-        /*
-        for (int i = 0; i < 5; i++) {
-            vendeurs[i] = null;
-            preneurs[i] = null;
-            offres[i] = "";
-        }
-        */
+
 
         gui = new MarcheGUI(this);
         gui.showGui();
@@ -108,7 +104,7 @@ public class Marche extends jade.domain.df {
             if (msg != null) {
                 switch(msg.getPerformative()) {
                     case ACLMessage.SUBSCRIBE:
-                        enregistrementPreneur(msg.getSender());
+                        //enregistrementPreneur(msg.getSender());
                         AID preneur = msg.getSender();
                         logger.info("Le preneur " + preneur.getName() + " veut s'abonner.");
                         // TODO
@@ -119,18 +115,15 @@ public class Marche extends jade.domain.df {
 
                     case FishMarketPerformatif.TO_ANNOUNCE:
                         AID vendeurAID = msg.getSender();
-                        String price = msg.getContent();
-                        offres.put(vendeurAID.getName(), new Offre(vendeurAID, price));
+                        Prix price = null;
+                        try {
+                            price = (Prix) msg.getContentObject();
+                        } catch (UnreadableException e) {
+                            throw new RuntimeException(e);
+                        }
+                        offres.put(vendeurAID.getName(), new Offre(vendeurAID, String.valueOf(price.getPrix())));
                         logger.info("Enregistrement de l'offre pour " + vendeurAID.getName());
                         gui.updateTable();
-
-                        // TODO A SUPPRIMER APR7S RECEPTION PRENEUR
-                        if (Integer.parseInt(price) < 50) {
-                            ACLMessage sub = new ACLMessage(ACLMessage.SUBSCRIBE);
-                            sub.addReceiver(vendeurAID);
-                            sub.ad
-                            send(sub);
-                        }
                         break;
                 }
             } else {
@@ -181,7 +174,7 @@ public class Marche extends jade.domain.df {
         }
     }
 
-
+/*
     private void enregistrementPreneur(AID preneur)  {
         for (int i = 0; i < preneurs.length; i++) {
             if (preneurs[i] == null) {
@@ -192,6 +185,8 @@ public class Marche extends jade.domain.df {
             }
         }
     }
+
+ */
 
     /**
      * Dans cette classe, les vendeurs sont stockés dans le tableau <b>vendeurs</b> sous forme d'AID.

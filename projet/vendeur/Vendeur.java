@@ -2,8 +2,11 @@ package vendeur;
 
 import jade.core.behaviours.*;
 import jade.core.AID;
+import jade.domain.AMSService;
 import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
@@ -12,6 +15,7 @@ import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +23,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import misc.FishMarketPerformatif;
+import misc.Prix;
 
 
 public class Vendeur extends GuiAgent {
@@ -47,6 +52,7 @@ public class Vendeur extends GuiAgent {
      */
     @Override
     protected void setup() {
+        this.
         logger.info("Agent Vendeur " + getName() + " is ready.");
 
         Object[] args = getArguments();
@@ -158,7 +164,7 @@ public class Vendeur extends GuiAgent {
                 ACLMessage msgReceived = myAgent.receive(mt);
                 if (msgReceived != null) {
                     String preneur = msgReceived.getContent();
-                    agentsPreneurs.add(msgReceived.getSender());
+                    //agentsPreneurs.put(msgReceived.getSender());
                     logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
                 }
 
@@ -182,6 +188,28 @@ public class Vendeur extends GuiAgent {
                         if (price >= 0) {
                             sendOffre();
                             returnPerformatif = FishMarketPerformatif.TO_ANNOUNCE;
+
+
+                            AMSAgentDescription[] agents = null;
+                            try {
+                                SearchConstraints c = new SearchConstraints();// object to searh                    //the container exist on the System
+                                c.setMaxResults (-1L);//define infinity result to C
+                                agents = AMSService.search(this.getAgent(), new AMSAgentDescription (), c );//putt all agent found on the system to the agents list
+                            }
+                            catch (Exception e) {
+                                System.out.println( "Problem searching AMS: " + e );
+                                e.printStackTrace();
+                            }
+
+                            AID myID = getAID();// this methode to get the idesntification of //agents such as (Name , adress , host ....etc)
+                            for (int i=0; i<agents.length;i++)
+                            {
+                                AID agentID = agents[i].getName();
+                                logger.info(
+                                        ( agentID.equals( myID ) ? "*** " : "    ")
+                                                + i + ": " + agentID.getName()
+                                );
+                            }
                         } else {
                             // TODO : voir comportement
                             //logger.info("Le prix est négatif.");
@@ -204,7 +232,11 @@ public class Vendeur extends GuiAgent {
      */
     public void sendOffre() {
         ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE); //CFP
-        msg.setContent(String.valueOf(price));
+        try {
+            msg.setContentObject(new Prix(price));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         msg.addReceiver(market);
         send(msg);
         logger.info("Message " + msg.getContent() + " envoyé");
@@ -276,7 +308,7 @@ public class Vendeur extends GuiAgent {
                 MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
                 ACLMessage msgReceived = myAgent.receive(mt);
                 if (msgReceived != null) {
-                    agentsPreneur.add(msgReceived.getSender());
+                  //  agentsPreneur.add(msgReceived.getSender());
                     logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
                 } else {
                     block();
@@ -286,7 +318,7 @@ public class Vendeur extends GuiAgent {
             MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); // PROPOSE
             ACLMessage msgReceived = myAgent.receive(mt);
             if (msgReceived != null) {
-                agentsPreneur.add(msgReceived.getSender());
+             //   agentsPreneur.add(msgReceived.getSender());
                 logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
                 returnPerformatif = FishMarketPerformatif.TO_BID;
             } else {
@@ -311,7 +343,7 @@ public class Vendeur extends GuiAgent {
             logger.info("Arrivé dans la classe Attribution.");
             ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ATTRIBUTE); //ACCEPT_PROPOSAL
             // TODO : modifier new AID
-            msg.addReceiver(agentsPreneur.get(0));
+            msg.addReceiver(agentsPreneurs.get(0));
             send(msg);
         }
 
