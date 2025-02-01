@@ -12,6 +12,7 @@ import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -22,7 +23,11 @@ public class Vendeur extends GuiAgent {
     private static final Logger logger = Logger.getLogger(Vendeur.class.getName());
     private VendeurGUI gui;
 
-    AID market = new AID("market", AID.ISLOCALNAME);
+    public AID getMarket() {
+        return market;
+    }
+
+    private AID market = new AID("market", AID.ISLOCALNAME);
     private AID preneur = null;
     private List<AID> agentsPreneur;
 
@@ -32,6 +37,7 @@ public class Vendeur extends GuiAgent {
     private int price;
     private int pas;
     private int temps;
+
 
 
     /**
@@ -44,6 +50,7 @@ public class Vendeur extends GuiAgent {
         Object[] args = getArguments();
         // Vérifie s'il y a les arguments nécessaires
         if (args != null && args.length > 0) {
+            List<AID> agentsPreneur = new ArrayList<>();
 
             gui = new VendeurGUI(this);
             gui.showGui();
@@ -81,9 +88,10 @@ public class Vendeur extends GuiAgent {
 
         } else {
             // Termine l'agent
-            System.out.println("Pas de nom de poisson spécifié.");
+            logger.info("Pas de nom de poisson spécifié.");
             doDelete();
         }
+        logger.info("Fin de setup du vendeur.");
     }
 
     /**
@@ -99,7 +107,7 @@ public class Vendeur extends GuiAgent {
             pas = (Integer) ev.getParameter(2);
             temps = (Integer) ev.getParameter(3);
 
-            logger.info("Enchère reçue : " + name + " à " + price + "€ avec une variation de " + pas + "€.");
+            logger.info("Enchère : " + name + " à " + price + "€ avec une variation de " + pas + "€.");
 
             // Description du service
             ServiceDescription sd = new ServiceDescription();
@@ -115,7 +123,7 @@ public class Vendeur extends GuiAgent {
             dfd.setName(getAID());
             dfd.addServices(sd);
             try {
-                DFService.register(this, getDefaultDF(), dfd);
+                DFService.register(this, new AID ("market", AID.ISLOCALNAME), dfd);
             } catch (FIPAException fe) {
                 fe.printStackTrace();
             }
@@ -138,20 +146,23 @@ public class Vendeur extends GuiAgent {
 
         @Override
         public void action() {
-            logger.info("Arrivé dans la classe AttentePremiereOffre.");
+            logger.info("Envoie d'un message TO-ANNONCE");
             ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE); //CFP
             msg.setContent(String.valueOf(price));
             msg.addReceiver(market);
             send(msg);
+            logger.info("Message " + msg.getContent() + " envoyé");
 
-            // TODO : vérifier comment on reçoit les messages SUBSCRIBE
+
             long start = System.currentTimeMillis();
-            while (System.currentTimeMillis() - start < temps * 1000) {
+            while (System.currentTimeMillis() - start < temps * 1000L) {
                 MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
                 ACLMessage msgReceived = myAgent.receive(mt);
                 if (msgReceived != null) {
                     agentsPreneur.add(msgReceived.getSender());
                     logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
+                } else {
+                    block();
                 }
             }
 
@@ -170,6 +181,7 @@ public class Vendeur extends GuiAgent {
 
         @Override
         public int onEnd() {
+            logger.info("Vendeur end : " + returnPerformatif);
             return returnPerformatif;
         }
     }
@@ -190,12 +202,14 @@ public class Vendeur extends GuiAgent {
             logger.info("Arrivé dans la classe AttenteSecondeOffre.");
 
             long start = System.currentTimeMillis();
-            while (System.currentTimeMillis() - start < temps * 1000) {
+            while (System.currentTimeMillis() - start < temps * 1000L) {
                 MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
                 ACLMessage msgReceived = myAgent.receive(mt);
                 if (msgReceived != null) {
                     agentsPreneur.add(msgReceived.getSender());
                     logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
+                } else {
+                    block();
                 }
             }
             MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); //PROPOSE
@@ -231,12 +245,14 @@ public class Vendeur extends GuiAgent {
             logger.info("Arrivé dans la classe AttenteAutresOffres");
 
             long start = System.currentTimeMillis();
-            while (System.currentTimeMillis() - start < temps * 1000) {
+            while (System.currentTimeMillis() - start < temps * 1000L) {
                 MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
                 ACLMessage msgReceived = myAgent.receive(mt);
                 if (msgReceived != null) {
                     agentsPreneur.add(msgReceived.getSender());
                     logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
+                } else {
+                    block();
                 }
             }
 

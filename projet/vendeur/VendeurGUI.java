@@ -1,6 +1,9 @@
 package vendeur;
 
+import jade.core.AID;
 import jade.gui.GuiEvent;
+import jade.lang.acl.ACLMessage;
+import misc.FishMarketPerformatif;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -100,6 +103,11 @@ public class VendeurGUI extends JFrame {
 
             DefaultTableModel model = (DefaultTableModel) tableauEnchere.getModel();
             model.addRow(new Object[]{name, price, ""});
+
+            ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE); //CFP
+            msg.setContent(String.valueOf(price));
+            msg.addReceiver(agent.getMarket());
+            agent.send(msg);
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Veuillez entrer des nombres valides.", "Erreur", JOptionPane.ERROR_MESSAGE);

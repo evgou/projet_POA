@@ -5,4 +5,4 @@ javac -classpath "../lib/jade.jar:../lib/commons-codec/commons-codec-1.3.jar" \
                     ../vendeur/VendeurGUI.java  \
                     ../marche/Marche.java  \
                     ../marche/MarcheGUI.java
-java -classpath "../lib/jade.jar:../lib/commons-codec/commons-codec-1.3.jar:../classes" jade.Boot -agents "Pierre:marche.Marche(Rocher)"
+java -Djava.util.logging.config.file="logging.properties" -classpath "../lib/jade.jar:../lib/commons-codec/commons-codec-1.3.jar:../classes" jade.Boot -agents "Vincent:vendeur.Vendeur(Vince);market:marche.Marche"
