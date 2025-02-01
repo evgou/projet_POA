@@ -27,8 +27,6 @@ public class PreneurAgentGUI extends JFrame {
         setSize(1000, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        logger.info("Je suis là");
-
 
         logArea = new JTextArea();
         logArea.setEditable(false);

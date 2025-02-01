@@ -6,7 +6,9 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.gui.GuiAgent;
 import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
 import misc.FishMarketPerformatif;
+import misc.Prix;
 
 import java.util.logging.Logger;
 
@@ -25,14 +27,8 @@ public class PreneurAgent extends GuiAgent {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			myName = (String) args[0];
-			try{
-				PreneurAgentGUI gui = new PreneurAgentGUI(this);
-				gui.showGui();
-			} catch (Exception e) {
-				logger.severe("Erreur de sauvegarde de l'agent : " + e.toString());
-			}
-
-			System.out.println("Agent " + getAID().getLocalName() + " est arrivé avant GUI");
+			PreneurAgentGUI gui = new PreneurAgentGUI(this);
+			gui.showGui();
 
 			try {
 				// Envoie du message pour signaler sa présence à l'agent Marché
@@ -45,6 +41,8 @@ public class PreneurAgent extends GuiAgent {
 			catch (Exception e) {
 				logger.severe("Erreur du message de " + getAID().getLocalName() + " : " + e.getMessage());
 			}
+
+			this.automate();
 		}
 		else {
 			// Make the agent terminate
@@ -58,7 +56,15 @@ public class PreneurAgent extends GuiAgent {
 	}
 
 	protected void automate(){
-		FSMBehaviour automatePreneur = new FSMBehaviour();
+		FSMBehaviour automatePreneur = new FSMBehaviour(){
+			@Override
+			public int onEnd() {
+				logger.info(getAID().getName() + "-------------------------> Behaviour completed.");
+				logger.info("Fin de l'enchère.");
+				logger.info("Agent Vendeur " + getAID().getName() + " terminating.");
+				return super.onEnd();
+			}
+		};
 
 		//On définit les états de l'agent Preneur
 		automatePreneur.registerFirstState(new departBehaviour(), "Départ");
@@ -70,12 +76,24 @@ public class PreneurAgent extends GuiAgent {
 
 		//On définit les transitions de l'agent Preneur
 		automatePreneur.registerTransition("Départ", "To Bid", 1);
+		automatePreneur.registerTransition("To Bid", "To Bid", 2);
 
 	}
 
 	private class departBehaviour extends OneShotBehaviour{
 		public void action(){
 			logger.info("action du depart behaviour");
+			ACLMessage msg = myAgent.receive();
+			if(msg != null && msg.getPerformative() == FishMarketPerformatif.TO_ANNOUNCE){
+				logger.info(getAID().getName() + " a reçu une offre");
+				try {
+					Prix prix = (Prix) msg.getContentObject();
+				} catch (UnreadableException e) {
+					logger.severe("Erreur du message de " + getAID().getName() + " : " + e.getMessage());
+					throw new RuntimeException(e);
+				}
+
+			}
 		}
 		public int onEnd(){
 			return 1;
