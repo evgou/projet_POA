@@ -16,19 +16,17 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import misc.FishMarketPerformatif;
-import misc.Prix;
+import marche.Prix;
 
 
-public class VendeurAgent extends GuiAgent {
-    private static final Logger logger = Logger.getLogger(VendeurAgent.class.getName());
-    private VendeurAgentGUI gui;
+public class Vendeur extends GuiAgent {
+    private static final Logger logger = Logger.getLogger(Vendeur.class.getName());
+    private VendeurGUI gui;
 
     private AID market = new AID("market", AID.ISLOCALNAME);
     private AID preneur = null;
@@ -66,7 +64,7 @@ public class VendeurAgent extends GuiAgent {
         // Vérifie s'il y a les arguments nécessaires
         if (args != null && args.length > 0) {
 
-            gui = new VendeurAgentGUI(this);
+            gui = new VendeurGUI(this);
             gui.showGui();
 
 

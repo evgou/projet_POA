@@ -12,7 +12,6 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import misc.FishMarketPerformatif;
 //import preneur.Preneur;
-import vendeur.VendeurAgent;
 
 import javax.swing.*;
 import java.util.*;
@@ -21,10 +20,12 @@ import java.util.logging.Logger;
 import static java.lang.Integer.valueOf;
 
 
-public class MarcheAgent extends jade.domain.df {
-    private static final Logger logger = Logger.getLogger(MarcheAgent.class.getName());
-    private MarcheAgentGUI gui;
-    private Map<AID, Prix> vendeursAgents = new HashMap<>();
+public class Marche extends jade.domain.df {
+    private static final Logger logger = Logger.getLogger(Marche.class.getName());
+    private MarcheGUI gui;
+    //private Map<AID, Prix> vendeursAgents = new HashMap<>();
+    private AID vendeur;
+    private Set<AID> preneurAgents = new HashSet<>();
 
 
     // Liste des offres / vendeurs (1 offre par vendeur)
@@ -34,7 +35,7 @@ public class MarcheAgent extends jade.domain.df {
     @Override
     protected void setup() {
 
-        gui = new MarcheAgentGUI(this);
+        gui = new MarcheGUI(this);
         gui.showGui();
 
         try {
@@ -60,11 +61,7 @@ public class MarcheAgent extends jade.domain.df {
             e.printStackTrace();
         }
 
-
-
-        //enregistrementService();
-
-
+        envoieSubscribeVendeur();
 
         addBehaviour(new EvolutionPrixEnchere());
         addBehaviour(new GestionFinEnchere());
@@ -89,22 +86,6 @@ public class MarcheAgent extends jade.domain.df {
         return dfd;
     }
 
-    private void enregistrementService() {
-        try {
-            DFAgentDescription dfd = getDescription();
-            DFService.register(this, dfd);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    private void enregistrementPreneur(AID preneur) {
-        //if (!preneurs.containsKey(preneur)) {
-        //    preneurs.put(preneur.getName(), preneur);
-        //    logger.info("Ajout de preneur " + preneur.getName());
-        //}
-    }
 
     private void searchServiceDescription(AID aid) {
         logger.info("Rentrer dans searchServiceDescription");
@@ -131,24 +112,6 @@ public class MarcheAgent extends jade.domain.df {
             throw new RuntimeException(e);
             //e.printStackTrace();
         }
-        /*
-        logger.info("Recherche du Service.");
-
-        try {
-            DFAgentDescription[] dfds = DFService.decodeNotification(vendeur.getContent());
-            logger.info("Taille de dfds : " + dfds.length);
-            for (DFAgentDescription dfd : dfds) {
-                Iterator<ServiceDescription> serviceIterator = dfd.getAllServices();
-                while (serviceIterator.hasNext()) {
-                    ServiceDescription service = serviceIterator.next();
-                    logger.info(service.getName() + " : service = " + service.getName() + " de type : " + service.getType());
-                }
-            }
-        } catch (FIPAException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
-         */
     }
 
 
@@ -158,20 +121,9 @@ public class MarcheAgent extends jade.domain.df {
             ACLMessage msg = myAgent.receive();
             //logger.info("Reception du message : " + (msg == null ? "null" : msg.getContent()));
             if (msg != null) {
-                logger.info("Performative = "+ msg.getPerformative());
 
-
-                searchServiceDescription(msg.getSender());
+                //searchServiceDescription(msg.getSender());
                 switch (msg.getPerformative()) {
-                    case ACLMessage.SUBSCRIBE:
-                        AID preneur = msg.getSender();
-                        logger.info("Le preneur " + preneur.getName() + " veut s'abonner.");
-                        enregistrementPreneur(preneur);
-                        envoieListeEnchere(preneur);
-                        // TODO : envoyer lun message SUBSCRIBE au vendeur concerné
-                        // TODO finir vendeur
-                        //envoieSubscribeVendeur(vendeur, preneur);
-                        break;
 
                     case FishMarketPerformatif.TO_ANNOUNCE:
                         try {
@@ -180,6 +132,7 @@ public class MarcheAgent extends jade.domain.df {
                             throw new RuntimeException(e);
                         }
                         AID vendeurAID = msg.getSender();
+                        vendeur = vendeurAID;
                         Prix prix = null;
                         try {
                             prix = (Prix) msg.getContentObject();
@@ -189,7 +142,15 @@ public class MarcheAgent extends jade.domain.df {
                         encheres.put(vendeurAID.getName(), prix);
                         logger.info("Enregistrement de l'offre pour " + vendeurAID.getName());
                         gui.updateTable();
-                        envoieOffrePeneur();
+                        envoieOffrePeneurs(vendeurAID, prix);
+                        break;
+
+                    case ACLMessage.SUBSCRIBE:
+                        AID preneur = msg.getSender();
+                        logger.info("Le preneur " + preneur.getName() + " veut s'abonner.");
+                        preneurAgents.add(preneur);
+                        logger.info("Liste des preneurs : " + preneurAgents);
+                        envoieSubscribeVendeur();
                         break;
                 }
             } else {
@@ -198,10 +159,13 @@ public class MarcheAgent extends jade.domain.df {
         }
     }
 
-    private void envoieOffrePeneur() {
-        ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE);
-        // TODO : le preneur doit récupérer les offres
-
+    private void envoieOffrePeneurs(AID vendeurAID, Prix prix) {
+        for (AID preneur : preneurAgents) {
+            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+            msg.addReceiver(preneur);
+            msg.setContent(String.valueOf(prix));
+            send(msg);
+        }
     }
 
 
@@ -224,6 +188,7 @@ public class MarcheAgent extends jade.domain.df {
 
 
     private void envoieListeEnchere(AID preneur) {
+
         List listEncheres = new ArrayList();
         for (Map.Entry<String, Prix> offre : encheres.entrySet()) {
             listEncheres.add(offre.getKey());
@@ -237,12 +202,12 @@ public class MarcheAgent extends jade.domain.df {
         logger.info("Liste des enchères envoyée à " + preneur.getLocalName());
     }
 
-    private void envoieSubscribeVendeur(AID vendeur, AID preneur) {
+    private void envoieSubscribeVendeur() {
         ACLMessage subs = new ACLMessage(ACLMessage.SUBSCRIBE);
-        subs.addReceiver(vendeur);
-        subs.setContent(preneur.getName());
+        subs.addReceiver(new AID ("Vincent", AID.ISLOCALNAME));
+        subs.setContent(preneurAgents.toString());
         send(subs);
-        logger.info("Message SUBSCRIBE envoyé à " + vendeur.getName() + " de " + preneur.getName());
+        logger.info("Message SUBSCRIBE envoyé à " + new AID ("Vincent", AID.ISLOCALNAME));
     }
 
     public void miseAJourGUI() {

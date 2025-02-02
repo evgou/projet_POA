@@ -1,25 +1,30 @@
 package preneur;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.Vector;
+import java.util.logging.Logger;
 
-public class GuiBis extends JFrame {
+
+public class PreneurGUI extends JFrame {
+    private final Preneur agent;
     private JTextField budgetField;
     private JRadioButton autoButton, manualButton;
     private JTable offersTable;
     private DefaultTableModel tableModel;
     private JButton validationButton;
     private JPanel bidButtonsPanel;
-    private PreneurAgent myAgent;
+    private static final Logger logger = Logger.getLogger(PreneurGUI.class.getName());
 
-    public GuiBis(PreneurAgent a) {
-        super(a.getLocalName());
-        myAgent = a;
 
-        // Configuration de la fenêtre principale
-        setLayout(new BorderLayout());
-        setSize(600, 400);
+    public PreneurGUI(Preneur agent) {
+        this.agent = agent;
+
+
+        setTitle(agent.getLocalName());
+        setSize(1000, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Panel du haut pour le budget et le mode
         JPanel topPanel = new JPanel(new FlowLayout());
@@ -81,21 +86,6 @@ public class GuiBis extends JFrame {
         setVisible(true);
     }
 
-    // Méthode pour ajouter une nouvelle offre à la table
-    public void addOffer(String vendeur, String lot, double prix) {
-        tableModel.addRow(new Object[]{false, vendeur, lot, prix});
-    }
-
-    // Méthode pour mettre à jour le prix d'une offre
-    public void updateOfferPrice(String vendeur, double newPrice) {
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            if (tableModel.getValueAt(i, 1).equals(vendeur)) {
-                tableModel.setValueAt(newPrice, i, 3);
-                break;
-            }
-        }
-    }
-
     // Méthode pour valider la sélection
     private void validateSelection() {
         // Vérifier si un budget a été entré en mode automatique
@@ -145,7 +135,7 @@ public class GuiBis extends JFrame {
             bidButtonsPanel.removeAll();
             for (String vendeur : selectedVendeurs) {
                 JButton bidButton = new JButton("Enchérir - " + vendeur);
-                bidButton.addActionListener(e -> myAgent.placeBid(vendeur));
+                bidButton.addActionListener(e -> agent.placeBid(vendeur));
                 bidButtonsPanel.add(bidButton);
             }
             bidButtonsPanel.setVisible(true);
@@ -155,16 +145,15 @@ public class GuiBis extends JFrame {
 
         // Informer l'agent des sélections
         float budget = autoButton.isSelected() ? Float.parseFloat(budgetField.getText()) : 0;
-        myAgent.onSelectionValidated(selectedVendeurs, autoButton.isSelected(), budget);
+        agent.onSelectionValidated(selectedVendeurs, autoButton.isSelected(), budget);
     }
 
-    // Méthode pour désactiver le bouton d'enchère d'un vendeur spécifique
-    public void disableBidButton(String vendeur) {
-        for (Component comp : bidButtonsPanel.getComponents()) {
-            if (comp instanceof JButton && ((JButton) comp).getText().equals("Enchérir - " + vendeur)) {
-                comp.setEnabled(false);
-                break;
-            }
-        }
+    // Méthode pour ajouter une nouvelle offre à la table
+    public void addOffer(String vendeur, String lot, double prix) {
+        tableModel.addRow(new Object[]{false, vendeur, lot, prix});
+    }
+
+    public void showGui() {
+        SwingUtilities.invokeLater(() -> setVisible(true));
     }
 }

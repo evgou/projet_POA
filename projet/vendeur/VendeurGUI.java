@@ -1,9 +1,6 @@
 package vendeur;
 
-import jade.core.AID;
 import jade.gui.GuiEvent;
-import jade.lang.acl.ACLMessage;
-import misc.FishMarketPerformatif;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,12 +10,12 @@ import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 
-public class VendeurAgentGUI extends JFrame {
+public class VendeurGUI extends JFrame {
 
-    private static final Logger logger = Logger.getLogger(VendeurAgentGUI.class.getName());
+    private static final Logger logger = Logger.getLogger(VendeurGUI.class.getName());
 
     private static final String Publication = "Publication";
-    private final VendeurAgent agent;
+    private final Vendeur agent;
     private JTextField ChampPrice;
     private JTextField ChampPas;
     private JTextField ChampName;
@@ -27,7 +24,7 @@ public class VendeurAgentGUI extends JFrame {
     private JTable tableauEnchere;
     private DefaultTableModel modeleTableau;
 
-    public VendeurAgentGUI(VendeurAgent agent) {
+    public VendeurGUI(Vendeur agent) {
         this.agent = agent;
         logger.info("Vendeur GUI initialized");
 

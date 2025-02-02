@@ -7,15 +7,15 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 
-public class MarcheAgentGUI extends JFrame {
+public class MarcheGUI extends JFrame {
 
-    private static final Logger logger = Logger.getLogger(MarcheAgentGUI.class.getName());
+    private static final Logger logger = Logger.getLogger(MarcheGUI.class.getName());
 
-    private final MarcheAgent agent;
+    private final Marche agent;
     private JTable table;
     private DefaultTableModel tableModel;
 
-    public MarcheAgentGUI(MarcheAgent agent) {
+    public MarcheGUI(Marche agent) {
         this.agent = agent;
 
         setTitle(agent.getLocalName());
@@ -38,7 +38,7 @@ public class MarcheAgentGUI extends JFrame {
     public void updateTable() {
         logger.info("Updating table marche");
         tableModel.setRowCount(0);
-        for (Map.Entry<String, Prix> entry : MarcheAgent.encheres.entrySet()) {
+        for (Map.Entry<String, Prix> entry : Marche.encheres.entrySet()) {
             tableModel.addRow(new String[]{entry.getKey(), "poisson", String.valueOf(entry.getValue().getPrice())});
         }
     }
