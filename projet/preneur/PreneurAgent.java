@@ -3,16 +3,20 @@ package preneur;
 import jade.core.AID;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.*;
+import jade.domain.FIPAException;
 import jade.gui.GuiAgent;
 import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
+import jade.proto.SubscriptionInitiator;
 import misc.FishMarketPerformatif;
 import misc.Prix;
-
+import jade.domain.DFService;
+import java.util.Vector;
 import java.util.logging.Logger;
 
-// TODO : Pour plus de compréhension, faire des constantes avec les états : TO_ANNOUNCE 1 etc...
 
 public class PreneurAgent extends GuiAgent {
 
@@ -41,6 +45,31 @@ public class PreneurAgent extends GuiAgent {
 			catch (Exception e) {
 				logger.severe("Erreur du message de " + getAID().getLocalName() + " : " + e.getMessage());
 			}
+
+			// Dans la méthode setup() de PreneurAgent
+			DFAgentDescription dfd = new DFAgentDescription();
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType("Fishmarket");
+			dfd.addServices(sd);
+
+			// Création du message d'abonnement au DF
+			ACLMessage subscriptionMsg = DFService.createSubscriptionMessage(this, getDefaultDF(), dfd, new SearchConstraints());
+
+			addBehaviour(new SubscriptionInitiator(this, subscriptionMsg) {
+				@Override
+				protected void handleInform(ACLMessage inform) {
+					try {
+						DFAgentDescription[] results = DFService.decodeNotification(inform.getContent());
+						for (DFAgentDescription dfd : results) {
+							AID vendeur = dfd.getName();
+							// TODO : Trouver comment ajouter les offres à l'IHM
+							gui.addOffer(vendeur.getLocalName(), "test", 40);
+						}
+					} catch (FIPAException fe) {
+						fe.printStackTrace();
+					}
+				}
+			});
 
 			this.automate();
 		}
@@ -153,5 +182,14 @@ public class PreneurAgent extends GuiAgent {
 	// Méthode pour afficher des messages sur l'IHM
 	public void log(String message) {
 		logger.info(message);
+	}
+
+	public void placeBid(String vendeur) {
+		logger.info(this.myName + " est dans placeBid : " + vendeur);
+	}
+
+	public void onSelectionValidated(Vector<String> offres, boolean isSelected, float budget) {
+		this._budget = budget;
+		logger.info(this.myName + " est dans onSelectionValidated : " + isSelected);
 	}
 }

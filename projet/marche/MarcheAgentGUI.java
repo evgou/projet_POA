@@ -1,62 +1,56 @@
 package marche;
 
-import jade.gui.GuiAgent;
-import jade.gui.GuiEvent;
+import jade.core.AID;
 
 import javax.swing.*;
-import javax.swing.plaf.metal.MetalIconFactory;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.Objects;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
+
+import static marche.MarcheAgent.offres;
 
 
 public class MarcheAgentGUI extends JFrame {
-    private final MarcheAgent agent;
-    private JTextArea logArea;
-    private JTextField commandField;
+
     private static final Logger logger = Logger.getLogger(MarcheAgentGUI.class.getName());
 
+    private final MarcheAgent agent;
+    private JTable table;
+    private DefaultTableModel tableModel;
 
     public MarcheAgentGUI(MarcheAgent agent) {
         this.agent = agent;
 
         setTitle(agent.getLocalName());
-        setSize(1000, 300);
+        setSize(800, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        logger.info("Je suis là");
-
-
-        logArea = new JTextArea();
-        logArea.setEditable(false);
-        add(new JScrollPane(logArea), BorderLayout.CENTER);
-
-        JPanel commandPanel = new JPanel();
-        commandField = new JTextField(20);
-        JButton sendButton = new JButton("Envoyer");
-        sendButton.addActionListener((ActionEvent e) -> sendCommand());
-        commandPanel.add(commandField);
-        commandPanel.add(sendButton);
-
-        add(commandPanel, BorderLayout.SOUTH);
+        logger.info("Marche GUI initialized");
     }
 
-    public void updateLog(String message) {
-        logArea.append(message + "\n");
+
+
+    private void addComponentToPanel(Container contentPane) {
+        String[] columnNames = {"Vendeur", "Nom du lot", "Prix courant de l'enchère"};
+        tableModel = new DefaultTableModel(columnNames, 0);
+        table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
+        contentPane.add(scrollPane, BorderLayout.CENTER);
+    }
+
+    public void updateTable() {
+        logger.info("Updating table marche");
+        tableModel.setRowCount(0);
+        for (Map.Entry<String, Offre> entry : MarcheAgent.offres.entrySet()) {
+            tableModel.addRow(new String[]{entry.getKey(), "poisson", entry.getValue().getPrice()});
+        }
     }
 
     public void showGui() {
+        addComponentToPanel(getContentPane());
         SwingUtilities.invokeLater(() -> setVisible(true));
     }
 
-    private void sendCommand() {
-        String command = commandField.getText();
-        if (!command.isEmpty()) {
-            GuiEvent event = new GuiEvent((Object)this, 2);
-            event.addParameter((Object) command);
-            agent.postGuiEvent(event);
-        }
-    }
 }
