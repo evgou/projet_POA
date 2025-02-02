@@ -19,8 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import jade.lang.acl.UnreadableException;
+import marche.Prix;
 import misc.FishMarketPerformatif;
-import misc.Prix;
 
 
 public class Vendeur extends GuiAgent {
@@ -52,14 +53,20 @@ public class Vendeur extends GuiAgent {
 
         logger.info("Agent Vendeur " + getName() + " is ready.");
 
+
+
         Object[] args = getArguments();
         // Vérifie s'il y a les arguments nécessaires
         if (args != null && args.length > 0) {
+
+
 
             gui = new VendeurGUI(this);
             gui.showGui();
 
             listAgents.add(market);
+
+
 
 
             // FSM Behaviour
@@ -101,6 +108,28 @@ public class Vendeur extends GuiAgent {
         logger.info("Fin de setup du vendeur.");
     }
 
+    private void registerService() {
+        // Description du service
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName(name);
+        sd.setType("Fishmarket");
+        // Agents that want to use this service need to "know" the fish-auction-ontology
+        sd.addOntologies("fish-auction-ontology");
+        // Agents that want to use this service need to "speak" the FIPA-SL language
+        sd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
+        logger.info("Content Language: " + FIPANames.ContentLanguage.FIPA_SL);
+
+        // Register the fishmarket service in the yellow pages
+        DFAgentDescription dfd = new DFAgentDescription();
+        dfd.setName(getAID());
+        dfd.addServices(sd);
+        try {
+            DFService.register(this, new AID("market", AID.ISLOCALNAME), dfd);
+        } catch (FIPAException fe) {
+            fe.printStackTrace();
+        }
+    }
+
     /**
      * @param ev The GUI event to handle.
      */
@@ -116,24 +145,7 @@ public class Vendeur extends GuiAgent {
 
             logger.info("Enchère : " + name + " à " + price + "€ avec une variation de " + pas + "€.");
 
-            // Description du service
-            ServiceDescription sd = new ServiceDescription();
-            sd.setName(name);
-            sd.setType("Fishmarket");
-            // Agents that want to use this service need to "know" the fish-auction-ontology
-            sd.addOntologies("fish-auction-ontology");
-            // Agents that want to use this service need to "speak" the FIPA-SL language
-            sd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
-
-            // Register the fishmarket service in the yellow pages
-            DFAgentDescription dfd = new DFAgentDescription();
-            dfd.setName(getAID());
-            dfd.addServices(sd);
-            try {
-                DFService.register(this, new AID("market", AID.ISLOCALNAME), dfd);
-            } catch (FIPAException fe) {
-                fe.printStackTrace();
-            }
+            registerService();
         }
 
     }
@@ -156,9 +168,13 @@ public class Vendeur extends GuiAgent {
             msg.addReceiver((AID) agent);
         }
         send(msg);
-        logger.info("Message " + msg.getContent() + " envoyé");
+        try {
+            logger.info("Message " + msg.getContentObject() + " envoyé");
+        } catch (UnreadableException e) {
+            throw new RuntimeException(e);
+        }
         start = System.currentTimeMillis(); // Enregistrement du début de l'envoie de l'offre
-        logger.info("start " + start);
+        //logger.info("start " + start);
     }
 
     private void attenteSubscribe() {

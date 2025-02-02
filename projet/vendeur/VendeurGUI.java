@@ -76,8 +76,6 @@ public class VendeurGUI extends JFrame {
         tableauEnchere = new JTable(modeleTableau);
         JScrollPane scrollPane = new JScrollPane(tableauEnchere);
         contentPane.add(scrollPane, BorderLayout.CENTER);
-
-
     }
 
     private void debutEnchere() {
@@ -106,6 +104,11 @@ public class VendeurGUI extends JFrame {
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Veuillez entrer des nombres valides.", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void updateTableau() {
+        modeleTableau.setRowCount(0);
+
     }
 
 
