@@ -46,8 +46,8 @@ public class Preneur extends GuiAgent {
             // Message d'abonnement
 
             // Création du message d'abonnement au DF
-            ACLMessage subscriptionMsg = DFService.createSubscriptionMessage(this, new AID ("market", AID.ISLOCALNAME), dfd, null);
-            subscriptionMsg.addReceiver(new AID ("market", AID.ISLOCALNAME));
+            ACLMessage subscriptionMsg = DFService.createSubscriptionMessage(this, new AID("market", AID.ISLOCALNAME), dfd, null);
+            subscriptionMsg.addReceiver(new AID("market", AID.ISLOCALNAME));
             send(subscriptionMsg);
 
             // FSM Behaviour
@@ -78,8 +78,7 @@ public class Preneur extends GuiAgent {
 
             addBehaviour(fsm);
 
-        }
-        else {
+        } else {
             // Make the agent terminate
             System.out.println("No name specified");
             doDelete();
@@ -87,7 +86,7 @@ public class Preneur extends GuiAgent {
     }
 
     protected void takeDown() {
-        System.out.println("Agent "+getAID().getName()+" terminating.");
+        System.out.println("Agent " + getAID().getName() + " terminating.");
     }
 
 
@@ -97,97 +96,111 @@ public class Preneur extends GuiAgent {
     }
 
 
-
     private class AJoutenchere extends OneShotBehaviour {
 
         @Override
         public void action() {
             ACLMessage sub = new ACLMessage(ACLMessage.SUBSCRIBE);
-            sub.addReceiver(new AID ("market", AID.ISLOCALNAME));
+            sub.addReceiver(new AID("market", AID.ISLOCALNAME));
             send(sub);
         }
     }
 
-    private class TraitementAnnonce extends OneShotBehaviour{
+    private class TraitementAnnonce extends OneShotBehaviour {
         private int returnPerformatif;
 
         @Override
-        public void action(){
-            logger.info("action du depart behaviour");
-            MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_ANNOUNCE);
-            ACLMessage msg = myAgent.receive(mt);
-            if(msg != null){
-                logger.info(getAID().getName() + " a reçu une offre");
-                try {
-                    Prix prix = (Prix) msg.getContentObject();
-                    logger.info("Prix reçu : " + prix);
-                } catch (UnreadableException e) {
-                    logger.severe("Erreur du message de " + getAID().getName() + " : " + e.getMessage());
-                    throw new RuntimeException(e);
+        public void action() {
+            ACLMessage msg = myAgent.receive();
+            if (msg != null) {
+                switch (msg.getPerformative()) {
+
+                    case FishMarketPerformatif.TO_ANNOUNCE:
+                        try {
+                            logger.info("Contenu du message (preneur) : " + msg.getContentObject());
+                        } catch (UnreadableException e) {
+                            throw new RuntimeException(e);
+                        }
+                        logger.info("Arrivé dans la classe TraitementAnnonce");
+                        //MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_ANNOUNCE);
+                        //ACLMessage msg = myAgent.receive(mt);
+                        //if(msg != null){
+                        logger.info(getAID().getName() + " a reçu une offre");
+                        try {
+                            Prix prix = (Prix) msg.getContentObject();
+                            logger.info("Prix reçu : " + prix);
+                        } catch (UnreadableException e) {
+                            logger.severe("Erreur du message de " + getAID().getName() + " : " + e.getMessage());
+                            throw new RuntimeException(e);
+                        }
+                        returnPerformatif = FishMarketPerformatif.TO_BID;
+                        break;
+                    default:
+                        logger.info("C'est un message de type : " + msg.getPerformative());
                 }
-                returnPerformatif = FishMarketPerformatif.TO_BID;
             } else {
-                //logger.info("Je n'ai rien");
+                logger.info("Je n'ai rien");
                 returnPerformatif = FishMarketPerformatif.TO_ANNOUNCE;
+                block();
             }
         }
 
-        @Override
-        public int onEnd(){
-            return returnPerformatif;
-        }
+    @Override
+    public int onEnd() {
+        return returnPerformatif;
     }
-
-    private class AttenteReponseOffre extends OneShotBehaviour{
-        private int returnPerformatif;
-
-        @Override
-        public void action(){
-            // TODO
-        }
-    }
-
-    private class AttenteAttribution extends OneShotBehaviour{
-        private int returnPerformatif;
-
-        @Override
-        public void action(){
-            // TODO
-        }
-    }
-
-    private class Paiement extends OneShotBehaviour{
-        private int returnPerformatif;
-
-        @Override
-        public void action(){
-            // TODO
-        }
-    }
-
-    private class AttenteLivraison extends OneShotBehaviour{
-        private int returnPerformatif;
-
-        @Override
-        public void action(){
-            // TODO
-        }
-    }
-
-
-    // Méthode pour afficher des messages sur l'IHM
-    public void log(String message) {
-        logger.info(message);
-    }
-
-    public void placeBid(String vendeur) {
-        logger.info(this.myName + " est dans placeBid : " + vendeur);
-    }
-
-    public void onSelectionValidated(Vector<String> offres, boolean isAuto, float budget) {
-        this._budget = budget;
-        this.modeAuto = isAuto;
-        logger.info(this.myName + " est dans onSelectionValidated : " + isAuto);
-    }
-    
 }
+
+private class AttenteReponseOffre extends OneShotBehaviour {
+    private int returnPerformatif;
+
+    @Override
+    public void action() {
+        // TODO
+    }
+}
+
+private class AttenteAttribution extends OneShotBehaviour {
+    private int returnPerformatif;
+
+    @Override
+    public void action() {
+        // TODO
+    }
+}
+
+private class Paiement extends OneShotBehaviour {
+    private int returnPerformatif;
+
+    @Override
+    public void action() {
+        // TODO
+    }
+}
+
+private class AttenteLivraison extends OneShotBehaviour {
+    private int returnPerformatif;
+
+    @Override
+    public void action() {
+        // TODO
+    }
+}
+
+
+// Méthode pour afficher des messages sur l'IHM
+public void log(String message) {
+    logger.info(message);
+}
+
+public void placeBid(String vendeur) {
+    logger.info(this.myName + " est dans placeBid : " + vendeur);
+}
+
+public void onSelectionValidated(Vector<String> offres, boolean isAuto, float budget) {
+    this._budget = budget;
+    this.modeAuto = isAuto;
+    logger.info(this.myName + " est dans onSelectionValidated : " + isAuto);
+}
+
+    }

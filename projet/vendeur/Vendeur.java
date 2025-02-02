@@ -13,10 +13,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 import jade.lang.acl.UnreadableException;
@@ -29,9 +26,8 @@ public class Vendeur extends GuiAgent {
     private static final AID market = new AID("market", AID.ISLOCALNAME);
 
     private VendeurGUI gui;
-    private Map<String, AID> agentsPreneurs = new HashMap<String, AID>();
     private AID preneur;
-    private List listAgents = new ArrayList();
+    private Set<AID> listAgents = new HashSet<AID>();
 
 
     // Initialisation du nom, du prix initial et du pas de variation du prix
@@ -153,42 +149,28 @@ public class Vendeur extends GuiAgent {
             throw new RuntimeException(e);
         }
         // listAgents contient le marché et tous les preneurs abonées
-        for (Object agent : listAgents) {
-            if (agent instanceof AID) {  // Vérifier si l'objet est bien un AID
-                msg.addReceiver((AID) agent);
-            } else
-            if (agent instanceof String) { // Si c'est une String, la convertir en AID
-                msg.addReceiver(new AID((String) agent, AID.ISLOCALNAME));
-            } else {
-                logger.warning("Impossible d'ajouter l'agent " + agent + " car il n'est ni un AID ni une String.");
-            }
+        for (AID agent : listAgents) {
+            msg.addReceiver((AID) agent);
         }
         send(msg);
-        try {
-            logger.info("Message " + msg.getContentObject() + " envoyé" + " à " + listAgents);
-        } catch (UnreadableException e) {
-            throw new RuntimeException(e);
-        }
         start = System.currentTimeMillis(); // Enregistrement du début de l'envoie de l'offre
-        //logger.info("start " + start);
     }
 
     private void attenteSubscribe() {
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
         ACLMessage msgReceived = this.receive(mt);
         if (msgReceived != null) {
-            AID preneur = msgReceived.getSender();
-            //String preneur = msgReceived.getContent();
-            if (!listAgents.contains(preneur)) {
-                listAgents.add(preneur);  // Ajoute correctement l'AID
-                logger.info("Preneur " + preneur.getLocalName() + " ajouté. " +
-                        "La liste d'envoi du message TO_ANNOUNCE est donc : " + listAgents);
-            } else {
-                logger.info("Preneur " + preneur.getLocalName() + " est déjà dans la liste.");
+            AID preneur = null;
+            try {
+                preneur = (AID) msgReceived.getContentObject();
+            } catch (UnreadableException e) {
+                throw new RuntimeException(e);
             }
+            listAgents.add(preneur);
+            logger.info("Preneur " + preneur + " ajouté. " +
+                    "La liste d'envoi du message TO_ANNOUNCE est donc : " + listAgents);
         }
     }
-
 
 
     /**
@@ -219,29 +201,8 @@ public class Vendeur extends GuiAgent {
 
                         if (price >= 0) {
                             sendOffre();
-                            returnPerformatif = FishMarketPerformatif.TO_ANNOUNCE;
-                            /*
-                            AMSAgentDescription[] agents = null;
-                            try {
-                                SearchConstraints c = new SearchConstraints();// object to searh                    //the container exist on the System
-                                c.setMaxResults (-1L);//define infinity result to C
-                                agents = AMSService.search(this.getAgent(), new AMSAgentDescription (), c );//putt all agent found on the system to the agents list
-                            }
-                            catch (Exception e) {
-                                System.out.println( "Problem searching AMS: " + e );
-                                e.printStackTrace();
-                            }
 
-                            AID myID = getAID();// this methode to get the idesntification of //agents such as (Name , adress , host ....etc)
-                            for (int i=0; i<agents.length;i++)
-                            {
-                                AID agentID = agents[i].getName();
-                                logger.info(
-                                        ( agentID.equals( myID ) ? "*** " : "    ")
-                                                + i + ": " + agentID.getName()
-                                );
-                            }
-                             */
+                            returnPerformatif = FishMarketPerformatif.TO_ANNOUNCE;
                         } else {
                             logger.info("Le prix est négatif.");
                             // Supression de l'agent et desenregistrement de l'enchère avec le takeDown

@@ -15,6 +15,7 @@ import misc.FishMarketPerformatif;
 import vendeur.Vendeur;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -22,7 +23,7 @@ import static java.lang.Integer.valueOf;
 
 
 public class Marche extends jade.domain.df {
-    private static final Logger logger = Logger.getLogger(Vendeur.class.getName());
+    private static final Logger logger = Logger.getLogger(Marche.class.getName());
     private MarcheGUI gui;
     //private Map<AID, Prix> vendeursAgents = new HashMap<>();
     private AID vendeur;
@@ -62,7 +63,7 @@ public class Marche extends jade.domain.df {
             e.printStackTrace();
         }
 
-        envoieSubscribeVendeur();
+        //envoieSubscribeVendeur();
 
         addBehaviour(new EvolutionPrixEnchere());
         addBehaviour(new GestionFinEnchere());
@@ -143,7 +144,7 @@ public class Marche extends jade.domain.df {
                         encheres.put(vendeurAID.getName(), prix);
                         logger.info("Enregistrement de l'offre pour " + vendeurAID.getName());
                         gui.updateTable();
-                        envoieOffrePeneurs(vendeurAID, prix);
+                        //envoieOffrePeneurs(vendeurAID, prix);
                         break;
 
                     case ACLMessage.SUBSCRIBE:
@@ -151,7 +152,7 @@ public class Marche extends jade.domain.df {
                         logger.info("Le preneur " + preneur.getName() + " veut s'abonner.");
                         preneurAgents.add(preneur);
                         logger.info("Liste des preneurs : " + preneurAgents);
-                        envoieSubscribeVendeur();
+                        envoieSubscribeVendeur(preneur);
                         break;
                 }
             } else {
@@ -189,7 +190,6 @@ public class Marche extends jade.domain.df {
 
 
     private void envoieListeEnchere(AID preneur) {
-
         List listEncheres = new ArrayList();
         for (Map.Entry<String, Prix> offre : encheres.entrySet()) {
             listEncheres.add(offre.getKey());
@@ -203,10 +203,14 @@ public class Marche extends jade.domain.df {
         logger.info("Liste des enchères envoyée à " + preneur.getLocalName());
     }
 
-    private void envoieSubscribeVendeur() {
+    private void envoieSubscribeVendeur(AID preneur){
         ACLMessage subs = new ACLMessage(ACLMessage.SUBSCRIBE);
         subs.addReceiver(new AID ("Vincent", AID.ISLOCALNAME));
-        subs.setContent(preneurAgents.toString());
+        try {
+            subs.setContentObject(preneur);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         send(subs);
         logger.info("Message SUBSCRIBE envoyé à " + new AID ("Vincent", AID.ISLOCALNAME));
     }
