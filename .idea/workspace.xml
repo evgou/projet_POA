@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="79b14fc7-5946-4a3f-8ad0-af38bf1bb8d9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/projet/preneur/PreneurAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/projet/preneur/PreneurAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projet/preneur/Preneur.java" beforeDir="false" afterPath="$PROJECT_DIR$/projet/preneur/Preneur.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projet/preneur/PreneurGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/projet/preneur/PreneurGUI.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,6 +127,7 @@
       <updated>1737362475416</updated>
       <workItem from="1737362476965" duration="2012000" />
       <workItem from="1738516257935" duration="399000" />
+      <workItem from="1738531330734" duration="11000" />
     </task>
     <servers />
   </component>

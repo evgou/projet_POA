@@ -149,7 +149,7 @@ public class PreneurGUI extends JFrame {
     }
 
     // Méthode pour ajouter une nouvelle offre à la table
-    public void addOffer(String vendeur, String lot, double prix) {
+    public void addOffer(String vendeur, String lot, int prix) {
         tableModel.addRow(new Object[]{false, vendeur, lot, prix});
     }
 
