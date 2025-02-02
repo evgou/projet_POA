@@ -2,11 +2,8 @@ package vendeur;
 
 import jade.core.behaviours.*;
 import jade.core.AID;
-import jade.domain.AMSService;
 import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
@@ -35,9 +32,9 @@ public class Vendeur extends GuiAgent {
     }
 
     private AID market = new AID("market", AID.ISLOCALNAME);
-    private AID preneur = null;
     private Map<String, AID> agentsPreneurs = new HashMap<String, AID>();
-
+    private AID preneur;
+    private List listAgents = new ArrayList();
 
     // Initialisation du nom, du prix initial et du pas de variation du prix
     private String name;
@@ -52,7 +49,7 @@ public class Vendeur extends GuiAgent {
      */
     @Override
     protected void setup() {
-        this.
+
         logger.info("Agent Vendeur " + getName() + " is ready.");
 
         Object[] args = getArguments();
@@ -61,6 +58,8 @@ public class Vendeur extends GuiAgent {
 
             gui = new VendeurGUI(this);
             gui.showGui();
+
+            listAgents.add(market);
 
 
             // FSM Behaviour
@@ -143,6 +142,39 @@ public class Vendeur extends GuiAgent {
     // Définiton de tous les états possibles de l'automate
 
     /**
+     * Envoie une offre au marché via un ACLMessage
+     */
+    public void sendOffre() {
+        ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE); //CFP
+        try {
+            msg.setContentObject(new Prix(price));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        // listAgents contient le marché et tous les preneurs abonées
+        for (Object agent : listAgents) {
+            msg.addReceiver((AID) agent);
+        }
+        send(msg);
+        logger.info("Message " + msg.getContent() + " envoyé");
+        start = System.currentTimeMillis(); // Enregistrement du début de l'envoie de l'offre
+        logger.info("start " + start);
+    }
+
+    private void attenteSubscribe() {
+        MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
+        ACLMessage msgReceived = this.receive(mt);
+        if (msgReceived != null) {
+            String preneur = msgReceived.getContent();
+            listAgents.add(preneur);
+            logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté. " +
+                    "La liste d'envoie du message TO_ANNOUNCE est donc : " + listAgents);
+        }
+    }
+
+
+
+    /**
      * <b>AttentePremiereOffre</b> envoie un message <i>TO_ANNOUNCE</i> au marché et attend une réponse.
      * <ul>
      *     <li>Si le vendeur reçoit un message SUSCRIBE, il ajoute le preneur à sa liste de preneurs d'abonnés.</li>
@@ -154,42 +186,24 @@ public class Vendeur extends GuiAgent {
 
         @Override
         public void action() {
-            //sendOffre();
-
             if (temps > 0) {
                 //logger.info("Temps d'attente enregistré = " + temps);
-
-
-                MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
-                ACLMessage msgReceived = myAgent.receive(mt);
-                if (msgReceived != null) {
-                    String preneur = msgReceived.getContent();
-                    //agentsPreneurs.put(msgReceived.getSender());
-                    logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
-                }
-
-
-
-
+                attenteSubscribe();
 
                 if (System.currentTimeMillis() - start > temps * 1000L) {
-                    /*
                     MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); //PROPOSE
                     ACLMessage msgReceived = myAgent.receive(mt);
+
                     if (msgReceived != null) {
-                        agentsPreneur.clear();
-                        agentsPreneur.add(msgReceived.getSender());
-                        logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
+                        preneur = msgReceived.getSender();
                         returnPerformatif = FishMarketPerformatif.TO_BID;
                     } else {
-
-                     */
                         price = price - pas;
+
                         if (price >= 0) {
                             sendOffre();
                             returnPerformatif = FishMarketPerformatif.TO_ANNOUNCE;
-
-
+                            /*
                             AMSAgentDescription[] agents = null;
                             try {
                                 SearchConstraints c = new SearchConstraints();// object to searh                    //the container exist on the System
@@ -210,12 +224,13 @@ public class Vendeur extends GuiAgent {
                                                 + i + ": " + agentID.getName()
                                 );
                             }
+                             */
                         } else {
-                            // TODO : voir comportement
-                            //logger.info("Le prix est négatif.");
+                            logger.info("Le prix est négatif.");
+                            // Supression de l'agent et desenregistrement de l'enchère avec le takeDown
+                            doDelete();
                         }
-
-                    //}
+                    }
                 }
             }
         }
@@ -225,23 +240,6 @@ public class Vendeur extends GuiAgent {
             //logger.info("Vendeur end : " + returnPerformatif);
             return returnPerformatif;
         }
-    }
-
-    /**
-     * Envoie une offre au marché via un ACLMessage
-     */
-    public void sendOffre() {
-        ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE); //CFP
-        try {
-            msg.setContentObject(new Prix(price));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        msg.addReceiver(market);
-        send(msg);
-        logger.info("Message " + msg.getContent() + " envoyé");
-        start = System.currentTimeMillis(); // Enregistrement du début de l'envoie de l'offre
-        logger.info("start " + start);
     }
 
 
@@ -258,27 +256,20 @@ public class Vendeur extends GuiAgent {
 
         @Override
         public void action() {
-            logger.info("Arrivé dans la classe AttenteSecondeOffre.");
+            if (temps > 0) {
+                attenteSubscribe();
 
-            long start = System.currentTimeMillis();
-            while (System.currentTimeMillis() - start < temps * 1000L) {
-                MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
-                ACLMessage msgReceived = myAgent.receive(mt);
-                if (msgReceived != null) {
-                   // agentsPreneur.add(msgReceived.getSender());
-                    logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
-                } else {
-                    block();
+                if (System.currentTimeMillis() - start > temps * 1000L) {
+                    MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); // PROPOSE
+                    ACLMessage msgReceived = myAgent.receive(mt);
+
+                    if (msgReceived != null) {
+                        returnPerformatif = FishMarketPerformatif.TO_BID;
+                    } else {
+                        // Attributionde l'enchère
+                        returnPerformatif = FishMarketPerformatif.REP_BID_OK;
+                    }
                 }
-            }
-            MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); //PROPOSE
-            ACLMessage msgReceived = myAgent.receive(mt);
-            if (msgReceived != null) {
-               // agentsPreneur.add(msgReceived.getSender());
-                logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
-                returnPerformatif = FishMarketPerformatif.TO_BID;
-            } else {
-                returnPerformatif = FishMarketPerformatif.REP_BID_OK;
             }
         }
 
@@ -301,29 +292,21 @@ public class Vendeur extends GuiAgent {
 
         @Override
         public void action() {
-            logger.info("Arrivé dans la classe AttenteAutresOffres");
+            if (temps > 0) {
+                attenteSubscribe();
 
-            long start = System.currentTimeMillis();
-            while (System.currentTimeMillis() - start < temps * 1000L) {
-                MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
-                ACLMessage msgReceived = myAgent.receive(mt);
-                if (msgReceived != null) {
-                  //  agentsPreneur.add(msgReceived.getSender());
-                    logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté.");
-                } else {
-                    block();
+                if (System.currentTimeMillis() - start > temps * 1000L) {
+                    MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); // PROPOSE
+                    ACLMessage msgReceived = myAgent.receive(mt);
+
+                    if (msgReceived != null) {
+                        returnPerformatif = FishMarketPerformatif.TO_BID;
+                    } else {
+                        price = price + pas;
+                        sendOffre();
+                        returnPerformatif = FishMarketPerformatif.REP_BID_NOK;
+                    }
                 }
-            }
-
-            MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_BID); // PROPOSE
-            ACLMessage msgReceived = myAgent.receive(mt);
-            if (msgReceived != null) {
-             //   agentsPreneur.add(msgReceived.getSender());
-                logger.info("Ajout de " + msgReceived.getSender().getLocalName() + " à la liste des agents preneurs.");
-                returnPerformatif = FishMarketPerformatif.TO_BID;
-            } else {
-                price = price + pas;
-                returnPerformatif = FishMarketPerformatif.REP_BID_NOK;
             }
         }
 
@@ -343,7 +326,7 @@ public class Vendeur extends GuiAgent {
             logger.info("Arrivé dans la classe Attribution.");
             ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ATTRIBUTE); //ACCEPT_PROPOSAL
             // TODO : modifier new AID
-            msg.addReceiver(agentsPreneurs.get(0));
+            msg.addReceiver(preneur);
             send(msg);
         }
 

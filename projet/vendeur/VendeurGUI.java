@@ -1,9 +1,6 @@
 package vendeur;
 
-import jade.core.AID;
 import jade.gui.GuiEvent;
-import jade.lang.acl.ACLMessage;
-import misc.FishMarketPerformatif;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -19,10 +16,10 @@ public class VendeurGUI extends JFrame {
 
     private static final String Publication = "Publication";
     private final Vendeur agent;
-    private JTextField ChampPrice;
-    private JTextField ChampPas;
-    private JTextField ChampName;
-    private JTextField ChampTempsAttente;
+    private JTextField champPrice;
+    private JTextField champPas;
+    private JTextField champName;
+    private JTextField champTempsAttente;
     private JButton sendButton;
     private JTable tableauEnchere;
     private DefaultTableModel modeleTableau;
@@ -38,10 +35,10 @@ public class VendeurGUI extends JFrame {
 
     private void addComponentToPanel(Container contentPane) {
 
-        ChampName = new JTextField();
-        ChampPrice = new JTextField();
-        ChampPas = new JTextField();
-        ChampTempsAttente = new JTextField();
+        champName = new JTextField();
+        champPrice = new JTextField();
+        champPas = new JTextField();
+        champTempsAttente = new JTextField();
 
         sendButton = new JButton();
         sendButton.setText("Créer l'enchère");
@@ -65,10 +62,10 @@ public class VendeurGUI extends JFrame {
         enchere.add(new JLabel("Pas de variation (€)"));
         enchere.add(new JLabel("Temps d'attente"));
         enchere.add(new JLabel(""));
-        enchere.add(ChampName);
-        enchere.add(ChampPrice);
-        enchere.add(ChampPas);
-        enchere.add(ChampTempsAttente);
+        enchere.add(champName);
+        enchere.add(champPrice);
+        enchere.add(champPas);
+        enchere.add(champTempsAttente);
         enchere.add(sendButton);
 
         contentPane.add(enchere, BorderLayout.NORTH);
@@ -86,10 +83,10 @@ public class VendeurGUI extends JFrame {
     private void debutEnchere() {
         try {
             // Récupération des paramètres
-            String name = ChampName.getText();
-            int price = Integer.parseInt(ChampPrice.getText());
-            int pas = Integer.parseInt(ChampPas.getText());
-            int temps = Integer.parseInt(ChampTempsAttente.getText());
+            String name = champName.getText();
+            int price = Integer.parseInt(champPrice.getText());
+            int pas = Integer.parseInt(champPas.getText());
+            int temps = Integer.parseInt(champTempsAttente.getText());
 
             // Création d'un événement pour Vendeur
             GuiEvent event = new GuiEvent(this, 1);
@@ -105,12 +102,6 @@ public class VendeurGUI extends JFrame {
             model.addRow(new Object[]{name, price, ""});
 
             agent.sendOffre();
-            /*
-            ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE); //CFP
-            msg.setContent(String.valueOf(price));
-            msg.addReceiver(agent.getMarket());
-            agent.send(msg);
-             */
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Veuillez entrer des nombres valides.", "Erreur", JOptionPane.ERROR_MESSAGE);
