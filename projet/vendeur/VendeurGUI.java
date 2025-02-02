@@ -106,11 +106,6 @@ public class VendeurGUI extends JFrame {
         }
     }
 
-    private void updateTableau() {
-        modeleTableau.setRowCount(0);
-
-    }
-
 
     public void showGui() {
         addComponentToPanel(getContentPane());

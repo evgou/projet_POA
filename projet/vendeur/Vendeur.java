@@ -53,8 +53,6 @@ public class Vendeur extends GuiAgent {
 
         logger.info("Agent Vendeur " + getName() + " is ready.");
 
-
-
         Object[] args = getArguments();
         // Vérifie s'il y a les arguments nécessaires
         if (args != null && args.length > 0) {
@@ -65,8 +63,6 @@ public class Vendeur extends GuiAgent {
             gui.showGui();
 
             listAgents.add(market);
-
-
 
 
             // FSM Behaviour
@@ -117,7 +113,6 @@ public class Vendeur extends GuiAgent {
         sd.addOntologies("fish-auction-ontology");
         // Agents that want to use this service need to "speak" the FIPA-SL language
         sd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
-        logger.info("Content Language: " + FIPANames.ContentLanguage.FIPA_SL);
 
         // Register the fishmarket service in the yellow pages
         DFAgentDescription dfd = new DFAgentDescription();
@@ -165,7 +160,13 @@ public class Vendeur extends GuiAgent {
         }
         // listAgents contient le marché et tous les preneurs abonées
         for (Object agent : listAgents) {
-            msg.addReceiver((AID) agent);
+            if (agent instanceof AID) {  // Vérifier si l'objet est bien un AID
+                msg.addReceiver((AID) agent);
+            } else if (agent instanceof String) { // Si c'est une String, la convertir en AID
+                msg.addReceiver(new AID((String) agent, AID.ISLOCALNAME));
+            } else {
+                logger.warning("Impossible d'ajouter l'agent " + agent + " car il n'est ni un AID ni une String.");
+            }
         }
         send(msg);
         try {
