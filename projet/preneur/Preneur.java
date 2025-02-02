@@ -1,19 +1,15 @@
 package preneur;
 
 import jade.core.AID;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.*;
-import jade.domain.FIPAException;
-import jade.domain.FIPANames;
 import jade.gui.GuiAgent;
 import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import jade.proto.SubscriptionInitiator;
 import misc.FishMarketPerformatif;
 import jade.domain.DFService;
 import marche.Prix;
@@ -35,8 +31,8 @@ public class Preneur extends GuiAgent {
         Object[] args = getArguments();
         if (args != null && args.length > 0) {
             myName = (String) args[0];
-            //PreneurAgentGUI gui = new PreneurAgentGUI(this);
-            //gui.showGui();
+            PreneurGUI gui = new PreneurGUI(this);
+            gui.showGui();
 
             // Dans la méthode setup() de PreneurAgent
             String serviceType = "Fishmarket";
@@ -54,9 +50,34 @@ public class Preneur extends GuiAgent {
             subscriptionMsg.addReceiver(new AID ("market", AID.ISLOCALNAME));
             send(subscriptionMsg);
 
-            this.automate();
+            // FSM Behaviour
+            FSMBehaviour fsm = new FSMBehaviour(this) {
+                public int onEnd() {
+                    logger.info(getAID().getName() + "-------------------------> Behaviour completed.");
+                    logger.info("Agent Vendeur " + getAID().getName() + " terminating.");
+                    return super.onEnd();
+                }
+            };
 
-            addBehaviour(new testReceivedInform());
+            // Définition des états
+            fsm.registerFirstState(new AJoutenchere(), "0");
+            fsm.registerState(new TraitementAnnonce(), "1");
+            fsm.registerState(new AttenteReponseOffre(), "2");
+            fsm.registerState(new AttenteAttribution(), "3");
+            fsm.registerState(new Paiement(), "4");
+            fsm.registerState(new AttenteLivraison(), "5");
+
+            // Définition des transactions
+            fsm.registerDefaultTransition("0", "1");
+            fsm.registerTransition("1", "1", FishMarketPerformatif.TO_ANNOUNCE);
+            fsm.registerTransition("1", "2", FishMarketPerformatif.TO_BID);
+            fsm.registerTransition("2", "1", FishMarketPerformatif.REP_BID_NOK);
+            fsm.registerTransition("2", "3", FishMarketPerformatif.REP_BID_OK);
+            fsm.registerTransition("3", "4", FishMarketPerformatif.TO_ATTRIBUTE);
+            fsm.registerTransition("4", "5", FishMarketPerformatif.TO_PAY);
+
+            addBehaviour(fsm);
+
         }
         else {
             // Make the agent terminate
@@ -69,53 +90,33 @@ public class Preneur extends GuiAgent {
         System.out.println("Agent "+getAID().getName()+" terminating.");
     }
 
-    protected void automate(){
-        FSMBehaviour automatePreneur = new FSMBehaviour(){
-            @Override
-            public int onEnd() {
-                logger.info(getAID().getName() + "-------------------------> Behaviour completed.");
-                logger.info("Fin de l'enchère.");
-                logger.info("Agent Vendeur " + getAID().getName() + " terminating.");
-                return super.onEnd();
-            }
-        };
-
-        //On définit les états de l'agent Preneur
-        automatePreneur.registerFirstState(new departBehaviour(), "Départ");
-        //automatePreneur.registerState(new toBidBehaviour(), "To Bid");
-        //automatePreneur.registerState(new repBidBehaviour(), "Rep Bid");
-        //automatePreneur.registerState(new attributeBehaviour(), "Attribute");
-        //automatePreneur.registerState(new toPayBehaviour(), "To Pay");
-        //automatePreneur.registerState(new toGiveBehaviour(), "To Give");
-
-        //On définit les transitions de l'agent Preneur
-        automatePreneur.registerTransition("Départ", "Départ", FishMarketPerformatif.TO_ANNOUNCE);
-        automatePreneur.registerTransition("Départ", "To Bid", FishMarketPerformatif.TO_BID);
-
-    }
 
     @Override
-    protected void onGuiEvent(GuiEvent guiEvent) {
-
+    protected void onGuiEvent(GuiEvent ev) {
+        logger.info("Commande reçue depuis l'IHM : " + ev.getAllParameter());
     }
 
-    private class testReceivedInform extends CyclicBehaviour {
+
+
+    private class AJoutenchere extends OneShotBehaviour {
 
         @Override
         public void action() {
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-            ACLMessage msgReceived = myAgent.receive(mt);
-            //logger.info("message received : from " + msgReceived.getSender());
+            ACLMessage sub = new ACLMessage(ACLMessage.SUBSCRIBE);
+            sub.addReceiver(new AID ("market", AID.ISLOCALNAME));
+            send(sub);
         }
     }
 
-    private class departBehaviour extends OneShotBehaviour{
+    private class TraitementAnnonce extends OneShotBehaviour{
         private int returnPerformatif;
 
+        @Override
         public void action(){
             logger.info("action du depart behaviour");
-            ACLMessage msg = myAgent.receive();
-            if(msg != null && msg.getPerformative() == FishMarketPerformatif.TO_ANNOUNCE){
+            MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_ANNOUNCE);
+            ACLMessage msg = myAgent.receive(mt);
+            if(msg != null){
                 logger.info(getAID().getName() + " a reçu une offre");
                 try {
                     Prix prix = (Prix) msg.getContentObject();
@@ -126,12 +127,50 @@ public class Preneur extends GuiAgent {
                 }
                 returnPerformatif = FishMarketPerformatif.TO_BID;
             } else {
-                logger.info("Je n'ai rien");
+                //logger.info("Je n'ai rien");
                 returnPerformatif = FishMarketPerformatif.TO_ANNOUNCE;
             }
         }
+
+        @Override
         public int onEnd(){
             return returnPerformatif;
+        }
+    }
+
+    private class AttenteReponseOffre extends OneShotBehaviour{
+        private int returnPerformatif;
+
+        @Override
+        public void action(){
+            // TODO
+        }
+    }
+
+    private class AttenteAttribution extends OneShotBehaviour{
+        private int returnPerformatif;
+
+        @Override
+        public void action(){
+            // TODO
+        }
+    }
+
+    private class Paiement extends OneShotBehaviour{
+        private int returnPerformatif;
+
+        @Override
+        public void action(){
+            // TODO
+        }
+    }
+
+    private class AttenteLivraison extends OneShotBehaviour{
+        private int returnPerformatif;
+
+        @Override
+        public void action(){
+            // TODO
         }
     }
 

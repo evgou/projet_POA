@@ -26,16 +26,13 @@ import misc.FishMarketPerformatif;
 
 public class Vendeur extends GuiAgent {
     private static final Logger logger = Logger.getLogger(Vendeur.class.getName());
+    private static final AID market = new AID("market", AID.ISLOCALNAME);
+
     private VendeurGUI gui;
-
-    public AID getMarket() {
-        return market;
-    }
-
-    private AID market = new AID("market", AID.ISLOCALNAME);
     private Map<String, AID> agentsPreneurs = new HashMap<String, AID>();
     private AID preneur;
     private List listAgents = new ArrayList();
+
 
     // Initialisation du nom, du prix initial et du pas de variation du prix
     private String name;
@@ -56,13 +53,10 @@ public class Vendeur extends GuiAgent {
         Object[] args = getArguments();
         // Vérifie s'il y a les arguments nécessaires
         if (args != null && args.length > 0) {
-
-
+            listAgents.add(market);
 
             gui = new VendeurGUI(this);
             gui.showGui();
-
-            listAgents.add(market);
 
 
             // FSM Behaviour
@@ -162,7 +156,8 @@ public class Vendeur extends GuiAgent {
         for (Object agent : listAgents) {
             if (agent instanceof AID) {  // Vérifier si l'objet est bien un AID
                 msg.addReceiver((AID) agent);
-            } else if (agent instanceof String) { // Si c'est une String, la convertir en AID
+            } else
+            if (agent instanceof String) { // Si c'est une String, la convertir en AID
                 msg.addReceiver(new AID((String) agent, AID.ISLOCALNAME));
             } else {
                 logger.warning("Impossible d'ajouter l'agent " + agent + " car il n'est ni un AID ni une String.");
@@ -170,7 +165,7 @@ public class Vendeur extends GuiAgent {
         }
         send(msg);
         try {
-            logger.info("Message " + msg.getContentObject() + " envoyé");
+            logger.info("Message " + msg.getContentObject() + " envoyé" + " à " + listAgents);
         } catch (UnreadableException e) {
             throw new RuntimeException(e);
         }
@@ -182,10 +177,15 @@ public class Vendeur extends GuiAgent {
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
         ACLMessage msgReceived = this.receive(mt);
         if (msgReceived != null) {
-            String preneur = msgReceived.getContent();
-            listAgents.add(preneur);
-            logger.info("Preneur " + msgReceived.getSender().getLocalName() + " ajouté. " +
-                    "La liste d'envoie du message TO_ANNOUNCE est donc : " + listAgents);
+            AID preneur = msgReceived.getSender();
+            //String preneur = msgReceived.getContent();
+            if (!listAgents.contains(preneur)) {
+                listAgents.add(preneur);  // Ajoute correctement l'AID
+                logger.info("Preneur " + preneur.getLocalName() + " ajouté. " +
+                        "La liste d'envoi du message TO_ANNOUNCE est donc : " + listAgents);
+            } else {
+                logger.info("Preneur " + preneur.getLocalName() + " est déjà dans la liste.");
+            }
         }
     }
 
@@ -273,6 +273,7 @@ public class Vendeur extends GuiAgent {
 
         @Override
         public void action() {
+            logger.info("Entrée dans le behaviour AttenteSecondeOffre.");
             if (temps > 0) {
                 attenteSubscribe();
 

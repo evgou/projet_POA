@@ -62,11 +62,7 @@ public class Marche extends jade.domain.df {
             e.printStackTrace();
         }
 
-
-
-        //enregistrementService();
-
-
+        envoieSubscribeVendeur();
 
         addBehaviour(new EvolutionPrixEnchere());
         addBehaviour(new GestionFinEnchere());
@@ -91,22 +87,6 @@ public class Marche extends jade.domain.df {
         return dfd;
     }
 
-    private void enregistrementService() {
-        try {
-            DFAgentDescription dfd = getDescription();
-            DFService.register(this, dfd);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    private void enregistrementPreneur(AID preneur) {
-        //if (!preneurs.containsKey(preneur)) {
-        //    preneurs.put(preneur.getName(), preneur);
-        //    logger.info("Ajout de preneur " + preneur.getName());
-        //}
-    }
 
     private void searchServiceDescription(AID aid) {
         logger.info("Rentrer dans searchServiceDescription");
@@ -163,7 +143,7 @@ public class Marche extends jade.domain.df {
                         encheres.put(vendeurAID.getName(), prix);
                         logger.info("Enregistrement de l'offre pour " + vendeurAID.getName());
                         gui.updateTable();
-                        envoieOffrePeneurs(vendeurAID);
+                        envoieOffrePeneurs(vendeurAID, prix);
                         break;
 
                     case ACLMessage.SUBSCRIBE:
@@ -171,9 +151,7 @@ public class Marche extends jade.domain.df {
                         logger.info("Le preneur " + preneur.getName() + " veut s'abonner.");
                         preneurAgents.add(preneur);
                         logger.info("Liste des preneurs : " + preneurAgents);
-                        // TODO : envoyer le preneur au vendeur
                         envoieSubscribeVendeur();
-
                         break;
                 }
             } else {
@@ -182,11 +160,11 @@ public class Marche extends jade.domain.df {
         }
     }
 
-    private void envoieOffrePeneurs(AID vendeurAID) {
+    private void envoieOffrePeneurs(AID vendeurAID, Prix prix) {
         for (AID preneur : preneurAgents) {
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(preneur);
-            msg.setContent("coucou de " + vendeurAID.getName());
+            msg.setContent(String.valueOf(prix));
             send(msg);
         }
     }

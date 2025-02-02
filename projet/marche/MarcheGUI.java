@@ -37,7 +37,6 @@ public class MarcheGUI extends JFrame {
     }
 
     public void updateTable() {
-        logger.info("Updating table marche");
         tableModel.setRowCount(0);
         for (Map.Entry<String, Prix> entry : Marche.encheres.entrySet()) {
             tableModel.addRow(new String[]{entry.getKey(), "poisson", String.valueOf(entry.getValue().getPrice())});
