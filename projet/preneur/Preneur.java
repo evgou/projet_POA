@@ -33,26 +33,20 @@ public class Preneur extends GuiAgent {
             //PreneurAgentGUI gui = new PreneurAgentGUI(this);
             //gui.showGui();
 
-            try {
-                // Envoie du message pour signaler sa présence à l'agent Marché
-                ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE);
-                msg.addReceiver(new AID("market", AID.ISLOCALNAME));
-                msg.setContent("1");
-                send(msg);
-                logger.info("ACLMessage : " + msg.getPerformative());
-            }
-            catch (Exception e) {
-                logger.severe("Erreur du message de " + getAID().getLocalName() + " : " + e.getMessage());
-            }
-
             // Dans la méthode setup() de PreneurAgent
+            String serviceType = "Fishmarket";
+            logger.info("Agent " + this.getName() + " trying to subscribe for services of type " + serviceType);
+
             DFAgentDescription dfd = new DFAgentDescription();
             ServiceDescription sd = new ServiceDescription();
-            sd.setType("Fishmarket");
+            sd.setType(serviceType);
             dfd.addServices(sd);
 
             // Création du message d'abonnement au DF
-            ACLMessage subscriptionMsg = DFService.createSubscriptionMessage(this, getDefaultDF(), dfd, new SearchConstraints());
+            ACLMessage subscriptionMsg = DFService.createSubscriptionMessage(this, new AID ("market", AID.ISLOCALNAME), dfd, null);
+            subscriptionMsg.addReceiver(new AID ("market", AID.ISLOCALNAME));
+            send(subscriptionMsg);
+
 
             addBehaviour(new SubscriptionInitiator(this, subscriptionMsg) {
                 @Override
@@ -121,6 +115,7 @@ public class Preneur extends GuiAgent {
                 logger.info(getAID().getName() + " a reçu une offre");
                 try {
                     Prix prix = (Prix) msg.getContentObject();
+                    logger.info("Prix reçu : " + prix);
                 } catch (UnreadableException e) {
                     logger.severe("Erreur du message de " + getAID().getName() + " : " + e.getMessage());
                     throw new RuntimeException(e);

@@ -2,5 +2,6 @@
 javac -classpath "../lib/jade.jar:../lib/commons-codec/commons-codec-1.3.jar" \
       -d ../classes ../misc/*.java \
                     ../vendeur/*.java \
-                    ../marche/*.java
-java -Djava.util.logging.config.file="logging.properties" -classpath "../lib/jade.jar:../lib/commons-codec/commons-codec-1.3.jar:../classes" jade.Boot -agents "Vincent:vendeur.Vendeur(Vincent);market:marche.Marche"
+                    ../marche/*.java \
+                    ../preneur/*.java
+java -Djava.util.logging.config.file="logging.properties" -classpath "../lib/jade.jar:../lib/commons-codec/commons-codec-1.3.jar:../classes" jade.Boot -agents "Vincent:vendeur.Vendeur(Vincent);market:marche.Marche;Paul:preneur.Preneur(Paul)"

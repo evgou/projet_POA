@@ -158,11 +158,8 @@ public class Marche extends jade.domain.df {
             ACLMessage msg = myAgent.receive();
             //logger.info("Reception du message : " + (msg == null ? "null" : msg.getContent()));
             if (msg != null) {
-                try {
-                    logger.info("Contenu du message : " + msg.getContentObject());
-                } catch (UnreadableException e) {
-                    throw new RuntimeException(e);
-                }
+                logger.info("Performative = "+ msg.getPerformative());
+
 
                 searchServiceDescription(msg.getSender());
                 switch (msg.getPerformative()) {
@@ -177,6 +174,11 @@ public class Marche extends jade.domain.df {
                         break;
 
                     case FishMarketPerformatif.TO_ANNOUNCE:
+                        try {
+                            logger.info("Contenu du message : " + msg.getContentObject());
+                        } catch (UnreadableException e) {
+                            throw new RuntimeException(e);
+                        }
                         AID vendeurAID = msg.getSender();
                         Prix prix = null;
                         try {
@@ -187,6 +189,7 @@ public class Marche extends jade.domain.df {
                         encheres.put(vendeurAID.getName(), prix);
                         logger.info("Enregistrement de l'offre pour " + vendeurAID.getName());
                         gui.updateTable();
+                        envoieOffrePeneur();
                         break;
                 }
             } else {
@@ -195,6 +198,11 @@ public class Marche extends jade.domain.df {
         }
     }
 
+    private void envoieOffrePeneur() {
+        ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE);
+        // TODO : le preneur doit récupérer les offres
+
+    }
 
 
     /**
