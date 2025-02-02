@@ -1,0 +1,43 @@
+Agent Paul started !
+[2025-02-02 18:48:58] [INFO   ] [vendeur.Vendeur setup] Agent Vendeur Vincent@192.168.1.35:1099/JADE is ready. 
+[2025-02-02 18:48:58] [INFO   ] [vendeur.VendeurGUI <init>] Vendeur GUI initialized 
+[2025-02-02 18:48:58] [INFO   ] [marche.MarcheGUI <init>] Marche GUI initialized 
+[2025-02-02 18:48:58] [INFO   ] [jade.domain.df DFRegister] Agent df - Added federation market@192.168.1.35:1099/JADE --> df@192.168.1.35:1099/JADE 
+2025-02-02 18:48:58.183 java[20163:13564415] +[IMKClient subclass]: chose IMKClient_Modern
+2025-02-02 18:48:58.183 java[20163:13564415] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+[2025-02-02 18:48:58] [INFO   ] [vendeur.Vendeur setup] Fin de setup du vendeur. 
+[2025-02-02 18:48:58] [INFO   ] [preneur.Preneur setup] Agent Paul@192.168.1.35:1099/JADE trying to subscribe for services of type Fishmarket 
+[2025-02-02 18:48:58] [INFO   ] [marche.Marche envoieSubscribeVendeur] Message SUBSCRIBE envoyé à ( agent-identifier :name Vincent@192.168.1.35:1099/JADE ) 
+[2025-02-02 18:48:58] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Le preneur Paul@192.168.1.35:1099/JADE veut s'abonner. 
+[2025-02-02 18:48:58] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Liste des preneurs : [( agent-identifier :name Paul@192.168.1.35:1099/JADE  :addresses (sequence http://localhost:7778/acc ))] 
+[2025-02-02 18:48:58] [INFO   ] [marche.Marche envoieSubscribeVendeur] Message SUBSCRIBE envoyé à ( agent-identifier :name Vincent@192.168.1.35:1099/JADE ) 
+[2025-02-02 18:48:58] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Le preneur Paul@192.168.1.35:1099/JADE veut s'abonner. 
+[2025-02-02 18:48:58] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Liste des preneurs : [( agent-identifier :name Paul@192.168.1.35:1099/JADE  :addresses (sequence http://localhost:7778/acc ))] 
+[2025-02-02 18:48:58] [INFO   ] [marche.Marche envoieSubscribeVendeur] Message SUBSCRIBE envoyé à ( agent-identifier :name Vincent@192.168.1.35:1099/JADE ) 
+[2025-02-02 18:49:10] [INFO   ] [vendeur.Vendeur onGuiEvent] Enchère : loup à 100€ avec une variation de 10€. 
+[2025-02-02 18:49:10] [INFO   ] [vendeur.Vendeur attenteSubscribe] Preneur market est déjà dans la liste. 
+[2025-02-02 18:49:10] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Contenu du message : 90 
+[2025-02-02 18:49:10] [INFO   ] [vendeur.Vendeur sendOffre] Message 90 envoyé à [( agent-identifier :name market@192.168.1.35:1099/JADE )] 
+[2025-02-02 18:49:10] [INFO   ] [vendeur.Vendeur sendOffre] Message 100 envoyé à [( agent-identifier :name market@192.168.1.35:1099/JADE )] 
+[2025-02-02 18:49:10] [INFO   ] [vendeur.Vendeur attenteSubscribe] Preneur market est déjà dans la liste. 
+[2025-02-02 18:49:10] [INFO   ] [vendeur.Vendeur attenteSubscribe] Preneur market est déjà dans la liste. 
+[2025-02-02 18:49:10] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Enregistrement de l'offre pour Vincent@192.168.1.35:1099/JADE 
+[2025-02-02 18:49:10] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Contenu du message : 100 
+[2025-02-02 18:49:10] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Enregistrement de l'offre pour Vincent@192.168.1.35:1099/JADE 
+[2025-02-02 18:49:20] [INFO   ] [vendeur.Vendeur sendOffre] Message 80 envoyé à [( agent-identifier :name market@192.168.1.35:1099/JADE )] 
+[2025-02-02 18:49:20] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Contenu du message : 80 
+[2025-02-02 18:49:20] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Enregistrement de l'offre pour Vincent@192.168.1.35:1099/JADE 
+[2025-02-02 18:49:30] [INFO   ] [vendeur.Vendeur sendOffre] Message 70 envoyé à [( agent-identifier :name market@192.168.1.35:1099/JADE )] 
+[2025-02-02 18:49:30] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Contenu du message : 70 
+[2025-02-02 18:49:30] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Enregistrement de l'offre pour Vincent@192.168.1.35:1099/JADE 
+[2025-02-02 18:49:40] [INFO   ] [vendeur.Vendeur sendOffre] Message 60 envoyé à [( agent-identifier :name market@192.168.1.35:1099/JADE )] 
+[2025-02-02 18:49:40] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Contenu du message : 60 
+[2025-02-02 18:49:40] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Enregistrement de l'offre pour Vincent@192.168.1.35:1099/JADE 
+[2025-02-02 18:49:50] [INFO   ] [vendeur.Vendeur sendOffre] Message 50 envoyé à [( agent-identifier :name market@192.168.1.35:1099/JADE )] 
+[2025-02-02 18:49:50] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Contenu du message : 50 
+[2025-02-02 18:49:50] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Enregistrement de l'offre pour Vincent@192.168.1.35:1099/JADE 
+[2025-02-02 18:50:00] [INFO   ] [vendeur.Vendeur sendOffre] Message 40 envoyé à [( agent-identifier :name market@192.168.1.35:1099/JADE )] 
+[2025-02-02 18:50:00] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Contenu du message : 40 
+[2025-02-02 18:50:00] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Enregistrement de l'offre pour Vincent@192.168.1.35:1099/JADE 
+[2025-02-02 18:50:10] [INFO   ] [vendeur.Vendeur sendOffre] Message 30 envoyé à [( agent-identifier :name market@192.168.1.35:1099/JADE )] 
+[2025-02-02 18:50:10] [INFO   ] [marche.Marche$EvolutionPrixEnchere action] Contenu du message : 30 

@@ -124,9 +124,7 @@ public class Marche extends jade.domain.df {
             //logger.info("Reception du message : " + (msg == null ? "null" : msg.getContent()));
             if (msg != null) {
 
-                //searchServiceDescription(msg.getSender());
                 switch (msg.getPerformative()) {
-
                     case FishMarketPerformatif.TO_ANNOUNCE:
                         try {
                             logger.info("Contenu du message : " + msg.getContentObject());
@@ -182,6 +180,7 @@ public class Marche extends jade.domain.df {
             if (msg != null) {
                 AID vendeur = msg.getSender();
                 SuppressionEnchere(vendeur);
+                logger.info("L'enhchère est fini pour " + vendeur.getLocalName() + " qui vendait "+ msg.getContent());
             } else {
                 block();
             }
@@ -229,7 +228,7 @@ public class Marche extends jade.domain.df {
         try {
             DFAgentDescription dfd = new DFAgentDescription();
             dfd.setName(vendeur);
-            DFService.deregister(this, dfd);
+            //DFService.deregister(this, dfd);
             // TODO : modifier l'affichage graphique
 
             logger.info("Enchère de " + vendeur.getLocalName() + " terminée.");

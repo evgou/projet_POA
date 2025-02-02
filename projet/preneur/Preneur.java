@@ -1,6 +1,7 @@
 package preneur;
 
 import jade.core.AID;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -10,6 +11,7 @@ import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import jade.proto.states.MsgReceiver;
 import misc.FishMarketPerformatif;
 import jade.domain.DFService;
 import marche.Prix;
@@ -23,6 +25,7 @@ public class Preneur extends GuiAgent {
     private float _budget;
     private float fondCourant;
     private boolean modeAuto = false;
+    private AID vendeur;
     private static final Logger logger = Logger.getLogger(Preneur.class.getName());
 
     protected void setup() {
@@ -116,19 +119,14 @@ public class Preneur extends GuiAgent {
                 switch (msg.getPerformative()) {
 
                     case FishMarketPerformatif.TO_ANNOUNCE:
-                        try {
-                            logger.info("Contenu du message (preneur) : " + msg.getContentObject());
-                        } catch (UnreadableException e) {
-                            throw new RuntimeException(e);
-                        }
-                        logger.info("Arrivé dans la classe TraitementAnnonce");
-                        //MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_ANNOUNCE);
-                        //ACLMessage msg = myAgent.receive(mt);
-                        //if(msg != null){
                         logger.info(getAID().getName() + " a reçu une offre");
                         try {
                             Prix prix = (Prix) msg.getContentObject();
                             logger.info("Prix reçu : " + prix);
+                            ACLMessage reply = new ACLMessage(FishMarketPerformatif.TO_BID); //PROPOSE
+                            reply.addReceiver(msg.getSender());
+                            send(reply);
+                            logger.info("Envoie d'un TO-BID au vendeur : " + msg.getSender().getLocalName());
                         } catch (UnreadableException e) {
                             logger.severe("Erreur du message de " + getAID().getName() + " : " + e.getMessage());
                             throw new RuntimeException(e);
@@ -136,7 +134,7 @@ public class Preneur extends GuiAgent {
                         returnPerformatif = FishMarketPerformatif.TO_BID;
                         break;
                     default:
-                        logger.info("C'est un message de type : " + msg.getPerformative());
+                        break;
                 }
             } else {
                 logger.info("Je n'ai rien");
@@ -145,62 +143,126 @@ public class Preneur extends GuiAgent {
             }
         }
 
-    @Override
-    public int onEnd() {
-        return returnPerformatif;
+        @Override
+        public int onEnd() {
+            return returnPerformatif;
+        }
     }
-}
 
-private class AttenteReponseOffre extends OneShotBehaviour {
-    private int returnPerformatif;
 
-    @Override
-    public void action() {
-        // TODO
+    private class AttenteReponseOffre extends OneShotBehaviour {
+        private int returnPerformatif;
+
+        @Override
+        public void action() {
+            logger.info("Arrivée dans la classe AttenteReponseOffre.");
+            doWait(20000);
+            ACLMessage msg = myAgent.receive();
+            if (msg != null) {
+                switch (msg.getPerformative()) {
+                    case FishMarketPerformatif.REP_BID_OK:
+                        logger.info(myAgent.getName() + " a reçu une réponse positive de " + msg.getSender());
+                        returnPerformatif = FishMarketPerformatif.REP_BID_OK;
+                        break;
+                    case FishMarketPerformatif.REP_BID_NOK:
+                        logger.info(myAgent.getName() + " a reçu une réponse négative de " + msg.getSender());
+                        returnPerformatif = FishMarketPerformatif.REP_BID_NOK;
+                        break;
+                    default:
+                        logger.info("Received performative " + msg.getPerformative());
+                        break;
+                }
+            } else {
+                logger.info("Je n'ai rien");
+                block();
+            }
+        }
+
+        @Override
+        public int onEnd() {
+            return returnPerformatif;
+        }
     }
-}
 
-private class AttenteAttribution extends OneShotBehaviour {
-    private int returnPerformatif;
+    private class AttenteAttribution extends OneShotBehaviour {
 
-    @Override
-    public void action() {
-        // TODO
+        public void action() {
+            logger.info("Arrivée dans la classe AttenteAttribution.");
+            ACLMessage msg = myAgent.receive();
+            if (msg != null) {
+                switch (msg.getPerformative()) {
+                    case FishMarketPerformatif.TO_ATTRIBUTE:
+                        logger.info("L'agent " + msg.getSender() + " a attribué l'offre à " + myAgent.getName());
+                        vendeur = msg.getSender();
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                block();
+            }
+        }
+
+        @Override
+        public int onEnd() {
+            return FishMarketPerformatif.TO_ATTRIBUTE;
+        }
     }
-}
 
-private class Paiement extends OneShotBehaviour {
-    private int returnPerformatif;
+    private class Paiement extends OneShotBehaviour {
 
-    @Override
-    public void action() {
-        // TODO
+        @Override
+        public void action() {
+            logger.info("Arrivée dans la classe Paiement, on veut envoyer un message au vendeur " + vendeur.getLocalName());
+            ACLMessage reply = new ACLMessage(FishMarketPerformatif.TO_PAY); //CONFIRM
+            reply.addReceiver(vendeur);
+            send(reply);
+        }
+
+        @Override
+        public int onEnd() {
+            return FishMarketPerformatif.TO_PAY;
+        }
     }
-}
 
-private class AttenteLivraison extends OneShotBehaviour {
-    private int returnPerformatif;
+    private class AttenteLivraison extends OneShotBehaviour {
 
-    @Override
-    public void action() {
-        // TODO
+        @Override
+        public void action() {
+            logger.info("Arrivée dans la classe AttenteLivraison.");
+            doWait(20000);
+            MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_GIVE); //AGREE
+            ACLMessage msg = myAgent.receive(mt);
+            if (msg != null) {
+                logger.info("L'agent vendeur " + msg.getSender().getLocalName() + " a livré " + msg.getContent() + " à " + myAgent.getName());
+            } else {
+                logger.warning(myAgent.getName() + " n'a pas reçu de messgae.");
+                block();
+            }
+
+        }
+
+        @Override
+        public int onEnd() {
+            logger.info("Fin de traitement, doDelete.");
+            return 0;
+        }
     }
-}
 
 
-// Méthode pour afficher des messages sur l'IHM
-public void log(String message) {
-    logger.info(message);
-}
-
-public void placeBid(String vendeur) {
-    logger.info(this.myName + " est dans placeBid : " + vendeur);
-}
-
-public void onSelectionValidated(Vector<String> offres, boolean isAuto, float budget) {
-    this._budget = budget;
-    this.modeAuto = isAuto;
-    logger.info(this.myName + " est dans onSelectionValidated : " + isAuto);
-}
-
+    // Méthode pour afficher des messages sur l'IHM
+    public void log(String message) {
+        logger.info(message);
     }
+
+    public void placeBid(String vendeur) {
+        logger.info(this.myName + " est dans placeBid : " + vendeur);
+    }
+
+    public void onSelectionValidated(Vector<String> offres, boolean isAuto, float budget) {
+        this._budget = budget;
+        this.modeAuto = isAuto;
+        logger.info(this.myName + " est dans onSelectionValidated : " + isAuto);
+    }
+
+}

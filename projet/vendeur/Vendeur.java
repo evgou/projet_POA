@@ -234,7 +234,6 @@ public class Vendeur extends GuiAgent {
 
         @Override
         public void action() {
-            logger.info("Entrée dans le behaviour AttenteSecondeOffre.");
             if (temps > 0) {
                 attenteSubscribe();
 
@@ -245,7 +244,11 @@ public class Vendeur extends GuiAgent {
                     if (msgReceived != null) {
                         returnPerformatif = FishMarketPerformatif.TO_BID;
                     } else {
-                        // Attributionde l'enchère
+                        // Attribution de l'enchère
+                        ACLMessage msg = new ACLMessage(FishMarketPerformatif.REP_BID_OK);
+                        msg.addReceiver(preneur);
+                        logger.info("J'envoie un REP_BID_OK à " + preneur);
+                        send(msg);
                         returnPerformatif = FishMarketPerformatif.REP_BID_OK;
                     }
                 }
@@ -321,7 +324,7 @@ public class Vendeur extends GuiAgent {
     private class AttentePaiement extends OneShotBehaviour {
         @Override
         public void action() {
-            logger.info("Arrivé dans la classe ReceivedConfirm.");
+            logger.info("Arrivé dans la classe AttentePaiement.");
             MessageTemplate mt = MessageTemplate.MatchPerformative(FishMarketPerformatif.TO_PAY); //CONFIRM
             ACLMessage msg = myAgent.receive(mt);
             if (msg == null) {
@@ -341,11 +344,12 @@ public class Vendeur extends GuiAgent {
     private class Livraison extends OneShotBehaviour {
         @Override
         public void action() {
-            logger.info("Arrivé dans la classe SendAgree.");
+            logger.info("Arrivé dans la classe Livraison.");
             // Envoie le message AGREE (TO_GIVE) au marché pour l'informer de la fin de l'enchère
             ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_GIVE); //AGREE
             msg.setContent(name);
             msg.addReceiver(market);
+            msg.addReceiver(preneur);
             send(msg);
             doDelete();
         }
@@ -362,7 +366,7 @@ public class Vendeur extends GuiAgent {
         try {
             DFService.deregister(this);
         } catch (FIPAException fe) {
-            fe.printStackTrace();
+            logger.warning("Deregister impossible : " + fe.getMessage());
         }
 
         // Ferme le GUI
