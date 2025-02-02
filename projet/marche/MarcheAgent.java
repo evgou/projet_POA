@@ -12,29 +12,27 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import misc.FishMarketPerformatif;
 //import preneur.Preneur;
-import misc.Prix;
 import vendeur.VendeurAgent;
 
 import javax.swing.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
+
+import static java.lang.Integer.valueOf;
 
 
 public class MarcheAgent extends jade.domain.df {
     private static final Logger logger = Logger.getLogger(MarcheAgent.class.getName());
     private MarcheAgentGUI gui;
-
+    private Map<AID, Prix> vendeursAgents = new HashMap<>();
 
 
     // Liste des offres / vendeurs (1 offre par vendeur)
-    public static Map<String, Offre> offres = new HashMap<>();
-    //public static Map<String, Preneur> preneurs = new HashMap<>();
+    public static Map<String, Prix> encheres = new HashMap<>();
+    //public static Map<String, AID> preneurs = new HashMap<>();
 
     @Override
     protected void setup() {
-
-
 
         gui = new MarcheAgentGUI(this);
         gui.showGui();
@@ -62,11 +60,14 @@ public class MarcheAgent extends jade.domain.df {
             e.printStackTrace();
         }
 
+
+
         //enregistrementService();
+
+
 
         addBehaviour(new EvolutionPrixEnchere());
         addBehaviour(new GestionFinEnchere());
-
 
     }
 
@@ -78,11 +79,12 @@ public class MarcheAgent extends jade.domain.df {
         dfd.setName(getAID());
         dfd.addProtocols(FIPANames.InteractionProtocol.FIPA_REQUEST);
         dfd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
+
         dfd.addOntologies("fish-auction-ontology");
 
         //  A "fipa-df" service is mandatory for the df federation
         sd.setName(getLocalName() + "fish-auction-df");
-        sd.setType("Fishmarket");
+        sd.setType("fipa-df");
         dfd.addServices(sd);
         return dfd;
     }
@@ -96,34 +98,98 @@ public class MarcheAgent extends jade.domain.df {
         }
     }
 
+
+    private void enregistrementPreneur(AID preneur) {
+        //if (!preneurs.containsKey(preneur)) {
+        //    preneurs.put(preneur.getName(), preneur);
+        //    logger.info("Ajout de preneur " + preneur.getName());
+        //}
+    }
+
+    private void searchServiceDescription(AID aid) {
+        logger.info("Rentrer dans searchServiceDescription");
+        try {
+            DFAgentDescription template = new DFAgentDescription();
+            ServiceDescription sd = new ServiceDescription();
+            sd.setType("Fishmarket");  // Recherche uniquement les vendeurs enregistrés sous "Fishmarket"
+            template.addServices(sd);
+            SearchConstraints sc = new SearchConstraints();
+            sc.setMaxResults(-1L);
+
+            DFAgentDescription[] result = DFService.search(this, template, sc);
+            logger.info("Nombre de vendeurs trouvés : " + result.length);
+
+
+            for (DFAgentDescription dfd : result) {
+                AID vendeur = dfd.getName();  // Récupère l'AID du vendeur
+                for (jade.util.leap.Iterator it = dfd.getAllServices(); it.hasNext(); ) {
+                    ServiceDescription service = (ServiceDescription) it.next();
+                    logger.info("Vendeur " + vendeur.getName() + " offre le service : " + service.getName());
+                }
+            }
+        } catch (FIPAException e) {
+            throw new RuntimeException(e);
+            //e.printStackTrace();
+        }
+        /*
+        logger.info("Recherche du Service.");
+
+        try {
+            DFAgentDescription[] dfds = DFService.decodeNotification(vendeur.getContent());
+            logger.info("Taille de dfds : " + dfds.length);
+            for (DFAgentDescription dfd : dfds) {
+                Iterator<ServiceDescription> serviceIterator = dfd.getAllServices();
+                while (serviceIterator.hasNext()) {
+                    ServiceDescription service = serviceIterator.next();
+                    logger.info(service.getName() + " : service = " + service.getName() + " de type : " + service.getType());
+                }
+            }
+        } catch (FIPAException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+         */
+    }
+
+
     private class EvolutionPrixEnchere extends CyclicBehaviour {
         @Override
         public void action() {
             ACLMessage msg = myAgent.receive();
-            logger.info("Reception du message : " + (msg == null ? "null" : msg.getContent()));
+            //logger.info("Reception du message : " + (msg == null ? "null" : msg.getContent()));
             if (msg != null) {
-                switch(msg.getPerformative()) {
+                logger.info("Performative = "+ msg.getPerformative());
+
+
+                searchServiceDescription(msg.getSender());
+                switch (msg.getPerformative()) {
                     case ACLMessage.SUBSCRIBE:
-                        //enregistrementPreneur(msg.getSender());
                         AID preneur = msg.getSender();
                         logger.info("Le preneur " + preneur.getName() + " veut s'abonner.");
-                        // TODO
-                        //for (AID vendeur : vendeurs) {
-                        //    envoyerSubscribeVendeur(vendeur, preneur);
-                        //}
+                        enregistrementPreneur(preneur);
+                        envoieListeEnchere(preneur);
+                        // TODO : envoyer lun message SUBSCRIBE au vendeur concerné
+                        // TODO finir vendeur
+                        //envoieSubscribeVendeur(vendeur, preneur);
                         break;
 
                     case FishMarketPerformatif.TO_ANNOUNCE:
-                        AID vendeurAID = msg.getSender();
-                        Prix price = null;
                         try {
-                            price = (Prix) msg.getContentObject();
+                            logger.info("Contenu du message : " + msg.getContentObject());
                         } catch (UnreadableException e) {
                             throw new RuntimeException(e);
                         }
-                        offres.put(vendeurAID.getName(), new Offre(vendeurAID, String.valueOf(price.getPrix())));
+                        AID vendeurAID = msg.getSender();
+                        Prix prix = null;
+                        try {
+                            prix = (Prix) msg.getContentObject();
+                        } catch (UnreadableException e) {
+                            throw new RuntimeException(e);
+                        }
+                        encheres.put(vendeurAID.getName(), prix);
                         logger.info("Enregistrement de l'offre pour " + vendeurAID.getName());
                         gui.updateTable();
+                        envoieOffrePeneur();
                         break;
                 }
             } else {
@@ -131,6 +197,13 @@ public class MarcheAgent extends jade.domain.df {
             }
         }
     }
+
+    private void envoieOffrePeneur() {
+        ACLMessage msg = new ACLMessage(FishMarketPerformatif.TO_ANNOUNCE);
+        // TODO : le preneur doit récupérer les offres
+
+    }
+
 
     /**
      * <b>GestionFinEnchere</b> permet de supprimer une enchère du marché si celle-ci a été attribuée
@@ -151,95 +224,23 @@ public class MarcheAgent extends jade.domain.df {
 
 
     private void envoieListeEnchere(AID preneur) {
-        try {
-            DFAgentDescription dfd = new DFAgentDescription();
-            ServiceDescription sd = new ServiceDescription();
-            sd.setType("Fishmarket");
-
-            DFAgentDescription[] result = DFService.search(this, dfd);
-            StringBuilder listeEncheres = new StringBuilder();
-
-            for (DFAgentDescription desc : result) {
-                listeEncheres.append(desc.getName().getLocalName()).append(" ");
-            }
-
-            ACLMessage reply = new ACLMessage(ACLMessage.INFORM);
-            reply.addReceiver(preneur);
-            reply.setContent(listeEncheres.toString());
-            send(reply);
-
-            logger.info("Liste des enchères envoyée à " + preneur.getLocalName());
-        } catch (Exception e) {
-            e.printStackTrace();
+        List listEncheres = new ArrayList();
+        for (Map.Entry<String, Prix> offre : encheres.entrySet()) {
+            listEncheres.add(offre.getKey());
         }
+
+        ACLMessage reply = new ACLMessage(ACLMessage.INFORM);
+        reply.addReceiver(preneur);
+        reply.setContent(listEncheres.toString());
+        send(reply);
+
+        logger.info("Liste des enchères envoyée à " + preneur.getLocalName());
     }
 
-/*
-    private void enregistrementPreneur(AID preneur)  {
-        for (int i = 0; i < preneurs.length; i++) {
-            if (preneurs[i] == null) {
-                preneurs[i] = preneur;
-                logger.info("Nouveau preneur : " + preneur);
-                envoieListeEnchere(preneur);
-                return;
-            }
-        }
-    }
-
- */
-
-    /**
-     * Dans cette classe, les vendeurs sont stockés dans le tableau <b>vendeurs</b> sous forme d'AID.
-
-     private void majListVendeur() {
-     DFAgentDescription template = new DFAgentDescription();
-     ServiceDescription sd = new ServiceDescription();
-     sd.setType("Fishmarket");
-     template.addServices(sd);
-     try {
-     DFAgentDescription[] result = DFService.search(this, template);
-     vendeurs = new AID[result.length];
-     for (int i = 0; i < result.length; i++) {
-     vendeurs[i] = result[i].getName();
-     logger.info("Enchère reçue " + vendeurs[i]);
-     }
-     miseAJourGUI();
-     } catch (FIPAException e) {
-     e.printStackTrace();
-     }
-     logger.info("Mise à jour du tableau des vendeurs.");
-     }
-
-     private void enregistrementOffre(AID vendeur, String offre) {
-     boolean vendeurTrouve = false;
-     for (int i = 0; i < vendeurs.length; i++) {
-     if (vendeurs[i].equals(vendeur)) {
-     offres[i] = offre;
-     logger.info("Nouvelle offre pour " + vendeur + " au prix de " + offre);
-     vendeurTrouve = true;
-     break;
-     }
-     }
-     if (!vendeurTrouve) {
-     for (int i = 0; i < vendeurs.length; i++) {
-     if (vendeurs[i] == null) {
-     vendeurs[i] = vendeur;
-     offres[i] = offre;
-     logger.info("Nouveau vendeur : " + vendeur.getLocalName() + " ajouté avec une offre à " + offre);
-     vendeurTrouve = true;
-     break;
-     }
-     }
-
-     }
-     gui.updateTable(vendeur, offre);
-     }
-     */
-
-    private void envoyerSubscribeVendeur(AID vendeur, AID preneur) {
+    private void envoieSubscribeVendeur(AID vendeur, AID preneur) {
         ACLMessage subs = new ACLMessage(ACLMessage.SUBSCRIBE);
         subs.addReceiver(vendeur);
-        subs.setContent("Abonnement du preneur " + preneur.getName());
+        subs.setContent(preneur.getName());
         send(subs);
         logger.info("Message SUBSCRIBE envoyé à " + vendeur.getName() + " de " + preneur.getName());
     }
@@ -259,6 +260,8 @@ public class MarcheAgent extends jade.domain.df {
             DFAgentDescription dfd = new DFAgentDescription();
             dfd.setName(vendeur);
             DFService.deregister(this, dfd);
+            // TODO : modifier l'affichage graphique
+
             logger.info("Enchère de " + vendeur.getLocalName() + " terminée.");
         } catch (Exception e) {
             e.printStackTrace();
@@ -274,6 +277,4 @@ public class MarcheAgent extends jade.domain.df {
         gui.dispose();
         logger.info("Agent " + getName() + " terminating.");
     }
-
-
 }

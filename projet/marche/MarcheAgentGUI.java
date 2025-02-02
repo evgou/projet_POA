@@ -1,15 +1,10 @@
 package marche;
 
-import jade.core.AID;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
-import static marche.MarcheAgent.offres;
 
 
 public class MarcheAgentGUI extends JFrame {
@@ -43,8 +38,8 @@ public class MarcheAgentGUI extends JFrame {
     public void updateTable() {
         logger.info("Updating table marche");
         tableModel.setRowCount(0);
-        for (Map.Entry<String, Offre> entry : MarcheAgent.offres.entrySet()) {
-            tableModel.addRow(new String[]{entry.getKey(), "poisson", entry.getValue().getPrice()});
+        for (Map.Entry<String, Prix> entry : MarcheAgent.encheres.entrySet()) {
+            tableModel.addRow(new String[]{entry.getKey(), "poisson", String.valueOf(entry.getValue().getPrice())});
         }
     }
 

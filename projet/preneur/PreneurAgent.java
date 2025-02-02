@@ -23,7 +23,20 @@ public class PreneurAgent extends GuiAgent {
 	private String myName;
 	private float _budget;
 	private float fondCourant;
+	private boolean modeAuto = false;
 	private static final Logger logger = Logger.getLogger(PreneurAgent.class.getName());
+
+	public float get_budget() {
+		return _budget;
+	}
+
+	public float getFondCourant() {
+		return fondCourant;
+	}
+
+	public boolean isModeAuto() {
+		return modeAuto;
+	}
 
 	protected void setup() {
 		System.out.println("Agent " + getAID().getLocalName() + " started !");
@@ -106,6 +119,11 @@ public class PreneurAgent extends GuiAgent {
 		//On définit les transitions de l'agent Preneur
 		automatePreneur.registerTransition("Départ", "To Bid", 1);
 		automatePreneur.registerTransition("To Bid", "To Bid", 2);
+		automatePreneur.registerTransition("To Bid", "Rep Bid", 3);
+		automatePreneur.registerTransition("Rep Bid", "Départ", 4);
+		automatePreneur.registerTransition("Rep Bid", "Attribute", 5);
+		automatePreneur.registerTransition("Attribute", "To Pay", 6);
+		automatePreneur.registerTransition("To Pay", "To Give", 7);
 
 	}
 
@@ -117,6 +135,9 @@ public class PreneurAgent extends GuiAgent {
 				logger.info(getAID().getName() + " a reçu une offre");
 				try {
 					Prix prix = (Prix) msg.getContentObject();
+					if(isModeAuto() && prix.getPrix() < fondCourant){
+						msg.createReply(FishMarketPerformatif.TO_BID);
+					}
 				} catch (UnreadableException e) {
 					logger.severe("Erreur du message de " + getAID().getName() + " : " + e.getMessage());
 					throw new RuntimeException(e);
@@ -188,8 +209,9 @@ public class PreneurAgent extends GuiAgent {
 		logger.info(this.myName + " est dans placeBid : " + vendeur);
 	}
 
-	public void onSelectionValidated(Vector<String> offres, boolean isSelected, float budget) {
+	public void onSelectionValidated(Vector<String> offres, boolean isAuto, float budget) {
 		this._budget = budget;
-		logger.info(this.myName + " est dans onSelectionValidated : " + isSelected);
+		this.modeAuto = isAuto;
+		logger.info(this.myName + " est dans onSelectionValidated : " + isAuto);
 	}
 }
